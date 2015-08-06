@@ -1,0 +1,89 @@
+    "%s doesn't exist":
+    "",
+
+    "%s is the language code for the respective disclaimer translation":
+    "",
+
+    "Agree":
+    "", 
+
+    "Agree disclaimer":
+    "",
+
+    "Contents of the file":
+    "",
+
+    "Continue":
+    "",
+
+    "Current PDF":
+    "",
+
+    "Decline":
+    "",
+
+    "Default language for the text":
+    "",
+
+    "Disclaimer of liability":
+    "",
+
+    "File not found":
+    "",
+
+    "I have read and understood the %s1disclaimer of liability%s2":
+    "",
+
+    "It can be a two character code, ie: %s or a five character code, ie: %s":
+    "",
+
+    "If the file for the user language doesn't exist, then the file for the default language will be used":
+    "",
+
+    "If the text file is bigger than this size, then its contents won't appear completely in the dialog, so, adjust the size till it is adequate to your needs":
+    "",
+
+    "If you want to modify this limit, do it at your own risk by changing the value of FILE_SIZE_LIMIT inside the Application.php file":
+    "",
+
+    "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
+    "",
+
+    "Likewise put your pdf files under":
+    "",
+
+    "Maximum file size in megabytes for the text file":
+    "",
+
+    "Neither the file: %s nor: %s exist":
+    "",
+
+    "Please read and agree the disclaimer before proceeding":
+    "",
+
+    "Please also note that there is a hard coded limit of: %s Megabytes; this limit was set in order to prevent setting higher values that will make ownCloud to crash":
+    "",
+
+    "Please contact the webmaster":
+    "",
+
+    "Show a link to a PDF file with the disclaimer":
+    "",
+
+    "Show a link to the disclaimer text":
+    "",
+
+    "Show/Hide help":
+    "",
+
+    "This must be set in order to prevent the download of big text files, which may block the login page":
+    "",
+
+    "To enable more languages, put your text files here":
+    "",
+
+    "Where":
+    "",
+
+    "You must check at least one option!":
+    ""

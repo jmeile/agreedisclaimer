@@ -1,0 +1,104 @@
+/**
+ * ownCloud - agreedisclaimer
+ *
+ * This file is licensed under the MIT License. See the COPYING file.
+ *
+ * @author Josef Meile <technosoftgratis@okidoki.com.co>
+ * @copyright Josef Meile 2015
+ */
+
+/**
+ * Style sheets for the login page
+ */
+
+/**
+ * Style for the div section above the password field
+ */
+.agreedisclaimer {
+    color: #A3A3A3;
+    background-color: #FFFFFF;
+    opacity: 1;
+    font-family: "Open Sans",Frutiger,Calibri,"Myriad Pro",Myriad,sans-serif;
+    font-size: 10pt;
+
+    margin-top: 0px;
+    margin-right: 7px;
+    margin-bottom: 3px;
+    margin-left: 5px;
+    padding-top: 7px;
+    padding-right: 6px;
+    padding-bottom: 5px;
+    padding-left: 6px;
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: #dddddd;
+    outline-width: medium;
+    outline-style: none;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+
+    width: 256px;
+    height:auto;
+}
+
+/**
+ * Style for the inputs on the disclaimer div
+ */
+.agreedisclaimer > input {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/*
+ * Div inside the disclaimer-div. It contains the text and the link to the txt
+ * file
+ */
+#agreedisclaimerDiv {
+    color: #aaaaaa;
+    margin: 0px;
+    padding: 0px;
+    margin-left: 4px;
+    margin-right: 2px;
+    height: auto;
+    width: 190px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/**
+ * Style for the images on the disclaimer div
+ */
+.agreedisclaimer > img {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    display: inline-block;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
+}
+
+/**
+ * Style for the links on the div containing the "agree" text
+ */
+#agreedisclaimerDiv a {
+    text-decoration: underline;
+}
+
+/**
+ * Style for the dialog showing the disclaimer text 
+ */
+#agreedisclaimerDialog {
+    text-align: justify;
+}
+
+
+/**
+ * Style for the dialog showing the file errors 
+ */
+#agreedisclaimerErrorDialog {
+    text-align: left;
+}
