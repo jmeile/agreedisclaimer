@@ -10,7 +10,10 @@
 
 namespace OCA\AgreeDisclaimer\Hooks;
 
-use OCA\AgreeDisclaimer\AppInfo\Application;
+use OCP\IUserManager;
+use OCP\IL10N;
+
+// hint: private code usage is bad!
 use OC\User\LoginException;
 
 /**
@@ -19,14 +22,18 @@ use OC\User\LoginException;
 class UserHooks {
 
     private $userManager;
+    private $l10n;
+    private $appName;
 
     /**
-     * Creates an UserHooks object 
+     * Creates an UserHooks object
      *
      * @param \OC\User\Manager  UserManager used by the hook
      */
-    public function __construct($userManager){
+    public function __construct(IUserManager $userManager, IL10n $l10n, $AppName){
         $this->userManager = $userManager;
+        $this->l10n = $l10n;
+        $this->appName = $AppName;
     }
 
     /**
@@ -34,14 +41,12 @@ class UserHooks {
      * disclaimer
      */
     public function register() {
-        $callback = function($user, $password) {
-            $appId = Application::APP_ID;
-            if(!isset($_POST[$appId . 'Checkbox'])) {
-                $message = \OCP\Util::getL10N($appId)->t('Please read and ' .
+        $this->userManager->listen('\OC\User', 'preLogin', function($user, $password) {
+            if(!isset($_POST[$this->appName . 'Checkbox'])) {
+                $message = $this->l10n->t('Please read and ' .
                     'agree the disclaimer before proceeding');
                 throw new LoginException($message);
             }
-        };
-        $this->userManager->listen('\OC\User', 'preLogin', $callback);
+        });
     }
 }

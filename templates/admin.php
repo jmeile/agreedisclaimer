@@ -9,11 +9,14 @@
  */
 
 /**
- * Template that will be rendered on the admin page 
+ * Template that will be rendered on the admin page
  */
 
 use \OCA\AgreeDisclaimer\Controller\SettingsController;
 use \OCA\AgreeDisclaimer\AppInfo\Application;
+
+// TODO: needs to be put into an admin controller that gets that template and renders it
+// Then use something like this file to include for registerAdmin https://github.com/owncloud/news/blob/master/admin/admin.php
 
 //Gets the application settings
 $appId = Application::APP_ID;
@@ -35,10 +38,10 @@ if ($adminSettings[$txtFileProp]['file']['error'] === '') {
 
 $pdfFileProp = $appId . 'PdfFile';
 $pdfFile = $adminSettings[$pdfFileProp]['value'];
-$pdfFileUrlProp = $pdfFileProp . 'Url'; 
+$pdfFileUrlProp = $pdfFileProp . 'Url';
 if ($adminSettings[$pdfFileProp]['file']['error'] === '') {
     //If there isn't any error with the pdf file, then a link to it will be
-    //shown 
+    //shown
     $pdfLink = $adminSettings[$pdfFileProp]['file']['url'];
     $pdfLink = '<a href="' . $pdfLink . '" target="_blank">' .
         $adminSettings[$pdfFileProp]['file']['name'] .'</a>';
@@ -111,7 +114,7 @@ style($appId, 'admin');
             <li>
                 <?php print_unescaped($l->t('%s is the language code for the ' .
                     'respective disclaimer translation',
-                    '<b>&lt;lang_code&gt;:</b>')); ?>. 
+                    '<b>&lt;lang_code&gt;:</b>')); ?>.
                 <?php print_unescaped($l->t('It can be a two character code, ' .
                     'ie: %s or a five character code, ie: %s',
                     array("<i>'en'</i>", "<i>'de_CH'</i>"))); ?>
@@ -122,7 +125,7 @@ style($appId, 'admin');
                  p($data[$appId . 'FilePreffix']); ?>_&lt;lang_code&gt;.pdf</b>
         <br/><br/>
         <?php p($l->t('If the file for the user language doesn\'t exist, ' .
-                'then the file for the default language will be used')); ?>. 
+                'then the file for the default language will be used')); ?>.
         <?php p($l->t('In case that the file for the default language ' .
                 'doesn\'t exist, then the user will see an error message ' .
                 'when trying to read the text')); ?>.<br/><br/>

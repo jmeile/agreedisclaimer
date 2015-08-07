@@ -14,15 +14,16 @@ namespace OCA\AgreeDisclaimer\AppInfo;
  * Creates the application only if it is enabled, then adds the javascript and
  * style sheets file to the login page.
  */
-$appId = Application::APP_ID;
-if ( \OCP\App::isEnabled($appId) ) {
-    $app = new Application();
+$app = new Application();
+$container = $app->getContainer();
 
-    /**
-     * Renders the disclaimer form only if the user isn't logged in
-     */
-    if ( !\OCP\User::isLoggedIn() ) {
-        $templateResponse = $app->getDisclaimerForm();
-        return $templateResponse->render();
-    }
+// TODO: this should be moved into a separate class
+$appId = $container->query('AppName');
+$userId = $container->query('UserId');
+$appManager = $container->query('OCP\App\IAppManager');
+$session = $container->query('OCP\IUserSession');
+
+if ($appManager->isEnabledForUser($appId, $userId) && !$session->isLoggedIn()) {
+    $templateResponse = $app->getDisclaimerForm();
+    return $templateResponse->render();
 }
