@@ -20,40 +20,72 @@ use \OCA\AgreeDisclaimer\Controller\SettingsController;
  * application settings are registered
  */
 class Application extends App {
+    const APP_ID = 'agreedisclaimer';
+
+    /** Preffix used for naming the txt and pdf files */
+    const FILE_PREFFIX = 'disclaimer';
+
+    /** Maximum file size in megabytes */
+    const FILE_SIZE_LIMIT = 3;
+
     /**
      * Creates an Application object and registers its related services,
-     * user hooks, and settings
+     * user hooks, and settings 
      */
     public function __construct(array $urlParams=array()) {
-        parent::__construct('agreedisclaimer', $urlParams);
-        $container = $this->getContainer();
-        // register parameters
-        $container->registerParameter('fileSizeLimit', 3);
-        $container->registerParameter('filePrefix', 'disclaimer');
-        $container->registerParameter('appPath', $this->buildPath(__DIR__, '..'));
-        $container->registerParameter('pdfPath', $this->buildPath($container->query('appPath'), 'pdf'));
-        $container->registerParameter('txtPath', $this->buildPath($container->query('appPath'), 'txt'));
-
-        $this->registerHooks($container);
-        $this->registerSettings($container);
-    }
-
-    private function buildPath(...$parts) {
-        return join(DIRECTORY_SEPARATOR, $parts);
+        parent::__construct(self::APP_ID, $urlParams);
+        $this->registerServices();
+        $this->registerHooks();
+        $this->registerSettings();
     }
 
     /**
-     * Registers all the application user hooks
+     * Registers all the application services
      */
-    private function registerHooks() {
-        $this->getContainer()->query('OCA\AgreeDisclaimer\Hooks\UserHooks')->register();
+    public function registerServices() {
+        $container = $this->getContainer();
+
+        /**
+         * Registers the translation service
+         */
+        $container->registerService('L10N', function($c) {
+            return $c->query('ServerContainer')->getL10N($c->query('AppName'));
+        });
+
+        /**
+         * Registers the controllers
+         */
+        $container->registerService('SettingsController', function($c) {
+            return new SettingsController (
+                $c->query('AppName'),
+                $c->query('Request')
+            );
+        });
+    }
+
+    /**
+     * Registers all the application user hooks 
+     */
+    public function registerHooks() {
+        $container = $this->getContainer();
+
+        /**
+         * Registers the preLogin hook to catch wether or not the user accepted
+         * the disclaimer.
+         */
+        $container->registerService('UserHooks', function($c) {
+            return new UserHooks(
+                $c->query('ServerContainer')->getUserManager()
+            );
+        });
+        $this->getContainer()->query('UserHooks')->register(); 
     }
 
     /**
      * Enables the application in the admin settings
      */
-    private function registerSettings($container) {
-        \OCP\App::registerAdmin($container->query('appName'), 'admin');
+    public function registerSettings() {
+        \OCP\App::registerAdmin(self::APP_ID, 'admin');
     }
 
     /**
@@ -77,7 +109,7 @@ class Application extends App {
      *
      * @param   string  $defaultLang    Current used language
      *
-     * @return array    An array of the form:
+     * @return array    An array of the form: 
      *     ['languages'       => <languages>,
      *      'commonlanguages' => <common_languages>,
      *      'activelanguage'  => <active_language>]
@@ -149,4 +181,40 @@ class Application extends App {
         );
     }
 
+    /**
+     * Gets the absolute path of the application in the file system
+     *
+     * @return string   The absolute path of the application in the file system
+     */
+    public static function getAppPath() {
+        return \OC::$SERVERROOT . DIRECTORY_SEPARATOR . 'apps' .
+            DIRECTORY_SEPARATOR . self::APP_ID;
+    }
+
+    /**
+     * Gets the absolute path of the txt files with the disclaimer text
+     *
+     *
+     * @return string   The absolute path to the 'txt' folder
+     *
+     * @remarks: This files are located on a folder called: 'txt' inside the
+     *           application's absolute path
+     */
+    public static function getTxtFilesPath() {
+        $appPath = Application::getAppPath() . DIRECTORY_SEPARATOR;
+        return $appPath . 'txt';
+    }
+
+    /**
+     * Gets the absolute path of the pdf files with the disclaimer text
+     *
+     * @return string   The absolute path to the 'pdf' folder
+     *
+     * @remarks: This files are located on a folder called: 'pdf' inside the
+     *           application's absolute path
+     */
+    public static function getPdfFilesPath() {
+        $appPath = Application::getAppPath() . DIRECTORY_SEPARATOR;
+        return $appPath . 'pdf';
+    }
 }
