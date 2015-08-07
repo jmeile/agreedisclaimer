@@ -12,20 +12,46 @@ namespace OCA\AgreeDisclaimer\Controller;
 
 use OCP\IRequest;
 use OCP\AppFramework\Controller;
-use OCA\AgreeDisclaimer\AppInfo\Application;
+use OCP\IAppConfig;
+use OCP\IL10N;
+use OCP\IURLGenerator;
+use OCP\ILogger;
+
 use OCA\AgreeDisclaimer\Utils;
-use \OCP\IL10N;
 
 /**
  * Controller to retreive some application settings through ajax
  */
 class SettingsController extends Controller {
 
+    private $appConfig;
+    private $filePrefix;
+    private $l10n;
+    private $urlGenerator;
+    private $logger;
+    private $loggerParameters;
+    private $utils;
+    private $txtPath;
+    private $pdfPath;
+
     /**
-     * Creates an instance to the SettingsController 
+     * Creates an instance to the SettingsController
+     * @param IAppConfig
      */
-    public function __construct($AppName, IRequest $request) {
+    public function __construct($AppName, IRequest $request,
+                                IAppConfig $appConfig, $filePrefix, IL10N $l10n,
+                                IURLGenerator $urlGenerator, ILogger $logger,
+                                Utils $utils, $pdfPath, $txtPath) {
         parent::__construct($AppName, $request);
+        $this->appConfig = $appConfig;
+        $this->filePrefix = $filePrefix;
+        $this->l10n = $l10n;
+        $this->urlGenerator = $urlGenerator;
+        $this->logger = $logger;
+        $this->loggerParameters = ['app' => $AppName];
+        $this->utils = $utils;
+        $this->txtPath = $txtPath;
+        $this->pdfPath = $pdfPath;
     }
 
     /**
@@ -34,20 +60,11 @@ class SettingsController extends Controller {
      * @param string            $settingName    Name of the setting to get
      * @param mixed             $defaultValue   Default value in case that the
      *        setting isn't found
-     * @param \OCP\IAppConfig   $appConfig      ownCloud's application
-     *        configuration. It is optional and if not passed, it will be
-     *        aquired by using the "getAppConfig" method of the Server class
-     *
      * @return mixed    The value of the specified setting
      */
-    public static function getSetting($settingName, $defaultValue = null,
-        $appConfig = null)
+    private function getSetting($settingName, $defaultValue = null)
     {
-        if ($appConfig === null)
-            $appConfig = \OC::$server->getAppConfig();
-
-        $appId = Application::APP_ID;
-        return $appConfig->getValue($appId, $settingName, $defaultValue);
+        return $this->appConfig->getValue($this->appName, $settingName, $defaultValue);
     }
 
     /**
@@ -107,38 +124,38 @@ class SettingsController extends Controller {
      *              ]
      */
     public function getSettings($getFileContents = true, $isAdminForm = false) {
-        $data = array();
-        $adminSettings = array();
+        $data = [];
+        $adminSettings = [];
 
-        $appConfig = \OC::$server->getAppConfig();
-        $appId = Application::APP_ID;
+        $appConfig = $this->appConfig;
+        $appId = $this->appName;
 
         $txtFileProp = $appId . 'TxtFile';
-        $adminSettings[$txtFileProp] = array();
-        $adminSettings[$txtFileProp]['value'] = self::getSetting($txtFileProp,
+        $adminSettings[$txtFileProp] = [];
+        $adminSettings[$txtFileProp]['value'] = $this->getSetting($txtFileProp,
             'true', $appConfig);
 
         $pdfFileProp = $appId . 'PdfFile';
-        $adminSettings[$pdfFileProp] = array();
-        $adminSettings[$pdfFileProp]['value'] = self::getSetting($pdfFileProp,
+        $adminSettings[$pdfFileProp] = [];
+        $adminSettings[$pdfFileProp]['value'] = $this->getSetting($pdfFileProp,
             'true', $appConfig);
 
-        $data['pdfIcon'] = \OC::$server->getURLGenerator()->linkTo($appId,
+        $data['pdfIcon'] = $this->urlGenerator->linkTo($appId,
             'pdf' . DIRECTORY_SEPARATOR . 'icon.png');
 
         $defaultLangProp = $appId . 'DefaultLang';
-        $adminSettings[$defaultLangProp] = array();
-        $defaultLang = self::getSetting($defaultLangProp, 'en', $appConfig);
+        $adminSettings[$defaultLangProp] = [];
+        $defaultLang = $this->getSetting($defaultLangProp, 'en', $appConfig);
         $adminSettings[$defaultLangProp]['value'] = $defaultLang;
 
         $maxTxtFileSizeProp = $appId . 'MaxTxtFileSize';
-        $adminSettings[$maxTxtFileSizeProp] = array();
-        $maxTxtFileSize = self::getSetting($maxTxtFileSizeProp, '1',
+        $adminSettings[$maxTxtFileSizeProp] = [];
+        $maxTxtFileSize = $this->getSetting($maxTxtFileSizeProp, '1',
             $appConfig);
-        $adminSettings[$maxTxtFileSizeProp]['value'] = $maxTxtFileSize; 
+        $adminSettings[$maxTxtFileSizeProp]['value'] = $maxTxtFileSize;
 
         if (!$isAdminForm) {
-            $userLang = Utils::getUserLang();
+            $userLang = $this->l10n->getLanguageCode();
             $getFallbackLang = true;
         } else {
             //For the admin form only the default language is
@@ -149,22 +166,22 @@ class SettingsController extends Controller {
             $getFallbackLang = false;
         }
         $data[$appId . 'UserLang'] = $userLang;
-        $txtFileBasePath = Application::getTxtFilesPath();
+        $txtFileBasePath = $this->txtPath;
         $adminSettings[$txtFileProp]['basePath'] = $txtFileBasePath;
-        $pdfFileBasePath = Application::getPdfFilesPath();
+        $pdfFileBasePath = $this->pdfPath;
         $adminSettings[$pdfFileProp]['basePath'] = $pdfFileBasePath;
 
-        $data[$appId . 'FilePreffix'] = Application::FILE_PREFFIX;
-        if (($adminSettings[$txtFileProp]['value'] === 'true') 
+        $data[$appId . 'FilePreffix'] = $this->filePrefix;
+        if (($adminSettings[$txtFileProp]['value'] === 'true')
           || $isAdminForm) {
-            $fileInfo = self::getFile($userLang, $defaultLang, $txtFileBasePath,
+            $fileInfo = $this->getFile($userLang, $defaultLang, $txtFileBasePath,
                 'txt', $getFileContents, $maxTxtFileSize, $getFallbackLang);
             $adminSettings[$txtFileProp]['file'] = $fileInfo;
         }
 
         if (($adminSettings[$pdfFileProp]['value'] === 'true')
           || $isAdminForm) {
-            $fileInfo = self::getFile($userLang, $defaultLang, $pdfFileBasePath,
+            $fileInfo = $this->getFile($userLang, $defaultLang, $pdfFileBasePath,
                 'pdf', false, 2, $getFallbackLang);
 
             $adminSettings[$pdfFileProp]['file'] = $fileInfo;
@@ -203,24 +220,24 @@ class SettingsController extends Controller {
      *                      'error'   => <error_message>,
      *                  ],
      */
-    public static function getFile($userLang, $defaultLang, $basePath, $fileExt,
+    public function getFile($userLang, $defaultLang, $basePath, $fileExt,
             $getContent = false, $maxFileSize = 2, $getFallbackLang = true) {
-        $fileInfo = array();
-        $appId = Application::APP_ID;
-        $fileName = Application::FILE_PREFFIX . '_' . $userLang . '.' .
+        $fileInfo = [];
+        $appId = $this->appName;
+        $fileName = $this->filePrefix . '_' . $userLang . '.' .
             $fileExt;
         $filePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
         $fileInfo['exists'] = file_exists($filePath);
         $fileInfo['lang'] = $userLang;
-        $langFallbacks = Utils::getFallbackLang($userLang);
+        $langFallbacks = $this->utils->getFallbackLang($userLang);
         $errorMsg = '';
         $userLangFile = $filePath;
         if (!$fileInfo['exists']) {
-            $errorMsg = \OCP\Util::getL10N($appId)->t('%s doesn\'t exist.',
+            $errorMsg = $this->l10n->t('%s doesn\'t exist.',
                 $userLangFile . '<br/>') . ' ' .
-                \OCP\Util::getL10N($appId)->t('Please contact the webmaster');
-            
-            $languages = array();
+                $this->l10n->t('Please contact the webmaster');
+
+            $languages = [];
             if ($getFallbackLang) {
                 $languages = array_merge($languages, $langFallbacks);
             }
@@ -228,7 +245,7 @@ class SettingsController extends Controller {
                 $languages[] = $defaultLang;
             }
             foreach ($languages as $langCode) {
-                $fileName = Application::FILE_PREFFIX . '_' .
+                $fileName = $this->filePrefix . '_' .
                     $langCode . '.' . $fileExt;
                 $filePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
                 $fileInfo['exists'] = file_exists($filePath);
@@ -240,7 +257,7 @@ class SettingsController extends Controller {
         }
 
         $fileInfo['path'] = $filePath;
-        $fileInfo['url'] = \OC::$server->getURLGenerator()->linkTo($appId,
+        $fileInfo['url'] = $this->urlGenerator->linkTo($appId,
             $fileExt . DIRECTORY_SEPARATOR . $fileName);
         $fileInfo['name'] = $fileName;
 
@@ -257,24 +274,24 @@ class SettingsController extends Controller {
                     'readable by the apache user';
 
                 //This ensures that carriage returns appear in a textarea
-                $message = Utils::fixCarriageReturns($message); 
-                \OCP\Util::writeLog($appId, $message, \OCP\Util::FATAL);
+                $message = $this->utils->fixCarriageReturns($message);
+                $this->logger->error($message, $this->loggerParameters);
                 $file_contents = '';
                 $fileInfo['error'] = $message;
             }
             $fileInfo['content'] = $file_contents;
         } elseif (!$fileInfo['exists']) {
             if ($userLang !== $defaultLang) {
-                $errorMsg = \OCP\Util::getL10N($appId)->t('Neither the file:' .
+                $errorMsg = $this->l10n->t('Neither the file:' .
                     ' %s nor: %s exist',
                     ['<br/>'. $userLangFile. '<br/><br/>',
                      '<br/>' . $filePath . '<br/><br/>']) . '. ' .
-                    \OCP\Util::getL10N($appId)->t('Please contact the ' . 
+                    $this->l10n->t('Please contact the ' .
                     'webmaster');
             }
             //This ensures that carriage returns appear in a textarea
-            $errorMsg = Utils::fixCarriageReturns($errorMsg); 
-            $fileInfo['error'] = $errorMsg; 
+            $errorMsg = $this->utils->fixCarriageReturns($errorMsg);
+            $fileInfo['error'] = $errorMsg;
         }
         return $fileInfo;
     }
@@ -286,9 +303,9 @@ class SettingsController extends Controller {
      *          form. This is used because the method can be also called from
      *          the login page. Here the differences:
      *          - When called from the admin form, no fall back languages will
-     *            be used 
+     *            be used
      *          - When called from the login form, fall back languages will be
-     *            used 
+     *            used
      * @param   string  $defaultLang    Default language for which the file will
      *          be recovered in case that it doesn't exist for the current
      *          language. In case that it is null, then the default language of
@@ -325,35 +342,31 @@ class SettingsController extends Controller {
      *          ]
      */
     function getFiles($isAdminForm = false, $defaultLang = null) {
-        $data = array();
-        $appId = Application::APP_ID;
-        $appConfig = \OC::$server->getAppConfig();
+        $data = [];
 
         if ($defaultLang === null) {
-            $defaultLangProp = $appId . 'DefaultLang';
-                    $defaultLang = self::getSetting($defaultLangProp, 'en',
-                $appConfig);
+            $defaultLangProp = $this->appName . 'DefaultLang';
+            $defaultLang = $this->getSetting($defaultLangProp, 'en');
         }
 
         if (!$isAdminForm) {
-            $userLang = Utils::getUserLang();
+            $userLang = $this->l10n->getLanguageCode();
             $getFallbackLang = true;
         } else {
             $userLang = $defaultLang;
             $getFallbackLang = false;
         }
 
-        $maxTxtFileSizeProp = $appId . 'MaxTxtFileSize';
-        $maxTxtFileSize = self::getSetting($maxTxtFileSizeProp, '1',
-                $appConfig);
-        $txtFileBasePath = Application::getTxtFilesPath();
-        $pdfFileBasePath = Application::getPdfFilesPath(); 
+        $maxTxtFileSizeProp = $this->appName . 'MaxTxtFileSize';
+        $maxTxtFileSize = $this->getSetting($maxTxtFileSizeProp, '1');
+        $txtFileBasePath = $this->txtPath;
+        $pdfFileBasePath = $this->pdfPath;
 
-        $fileInfo = self::getFile($userLang, $defaultLang, $txtFileBasePath,
+        $fileInfo = $this->getFile($userLang, $defaultLang, $txtFileBasePath,
             'txt', true, $maxTxtFileSize, $getFallbackLang);
         $data['txtFile'] = $fileInfo;
 
-        $fileInfo = self::getFile($userLang, $defaultLang, $pdfFileBasePath,
+        $fileInfo = $this->getFile($userLang, $defaultLang, $pdfFileBasePath,
             'pdf', false, 2, $getFallbackLang);
         $data['pdfFile'] = $fileInfo;
         return $data;
