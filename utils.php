@@ -11,10 +11,23 @@
 namespace OCA\AgreeDisclaimer;
 
 class Utils {
+    /**
+     * Gets the language of the user, including anonymous 
+     *
+     * @return The user language
+     */
+    public static function getUserLang() {
+        $config = \OC::$server->getConfig();
+        $lang = \OC_L10N::findLanguage();
+        $userLang = $config->getUserValue(\OC_User::getUser(), 'core', 'lang',
+            $lang);
+        return $userLang;
+    }
+
     /** Define your language fallbacks here. The leftmost language will have
       * precedency
       */
-    private $LANG_FALLBACKS = [
+    public static $LANG_FALLBACKS = [
         'de' => [ 'de_DE', 'de' ]
     ];
 
@@ -38,7 +51,7 @@ class Utils {
      *  that 'pt_PT' and 'pt' fallback to 'pt_BR' in that case, you will have to
      *  modify the LANG_FALLBACKS constant and add: 'pt' => [ 'pt_BR', 'pt' ]
      */
-    public function getFallbackLang($userLang) {
+    public static function getFallbackLang($userLang) {
         $rootLang = $userLang;
         if (strlen($userLang) == 5) {
             $langParts = explode('_', $userLang);
@@ -46,10 +59,10 @@ class Utils {
         }
 
         $langFallbacks = [$rootLang];
-        if (isset($this->langFallbacks[$rootLang])) {
-            $langFallbacks = $this->langFallbacks[$rootLang];
+        if (isset(self::$LANG_FALLBACKS[$rootLang])) {
+            $langFallbacks = self::$LANG_FALLBACKS[$rootLang];
         }
-        return $langFallbacks;
+        return $langFallbacks; 
     }
 
     /**
@@ -57,8 +70,9 @@ class Utils {
      * html textarea
      *
      * @return string   The sring with the fixed carriage returns
-     */
-    public function fixCarriageReturns($str) {
-        return preg_replace('/(\\\r)?\\\n/', "\n", $str);
+¨    */
+    public static function fixCarriageReturns($str) {
+        $result = preg_replace('/(\\\r)?\\\n/', "\n", $str);
+        return $result;
     }
 }

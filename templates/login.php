@@ -14,6 +14,36 @@
 
 $appId = $_['appId'];
 
+//Gets the current user's language
+$userLang = \OCA\AgreeDisclaimer\Utils::getUserLang();
+if (!\OC_L10N::languageExists($appId, $userLang)) {
+    #It can be that some language dialects hasn't being translated, so, a
+    #suitable language will be searched. ie: if 'de_CH' isn't available, then
+    #'de_DE' (formal german) will be used. In case that 'de_DE' isn't available,
+    #then 'de' (informal german will be used). If no fallback language is found,
+    #then the defined default language will be used. In case nothing is found,
+    #then ownCloud will decide which language to use, which in most cases is
+    #'en'.
+    $langFallbacks = \OCA\AgreeDisclaimer\Utils::getFallbackLang($userLang);
+
+    $defaultLangProp = $appId . 'DefaultLang';
+    $defLang = \OCA\AgreeDisclaimer\Controller\SettingsController::getSetting(
+               $defaultLangProp, 'en');
+
+    if ($defLang !== $userLang) {
+        $langFallbacks[] = $defLang; 
+    }
+
+    foreach ($langFallbacks as $langCode) {
+        if (\OC_L10N::languageExists($appId, $langCode)) {
+            \OC_L10N::forceLanguage($langCode);
+            \OCP\Util::writeLog($appId, "The language: $userLang hasn't been " .
+                "yet translated, falling back to: $langCode", \OCP\Util::WARN);
+            break;
+        }
+    }
+}
+
 /**
  * Adds the javascript utilities to the login page
  */
