@@ -2,41 +2,72 @@
 /**
  * ownCloud - agreedisclaimer
  *
- * This file is licensed under the MIT License. See the COPYING file.
+ * This file is licensed under the MIT License. See the LICENSE file.
  *
  * @author Josef Meile <technosoftgratis@okidoki.com.co>
  * @copyright Josef Meile 2015
  */
-
 namespace OCA\AgreeDisclaimer\AppInfo;
+use OCP\AppFramework\App;
+use OCP\AppFramework\IAppContainer;
 
-use \OCP\AppFramework\App;
-use \OCA\AgreeDisclaimer\Hooks\UserHooks;
-use \OCP\AppFramework\Http\TemplateResponse;
-use \OCA\AgreeDisclaimer\Controller\SettingsController;
+use OCP\AppFramework\Http\TemplateResponse;
+
+use OCA\AgreeDisclaimer\Config\Config;
+use OCA\AgreeDisclaimer\Utils;
 
 /**
  * Main application class where all the services, controllers, hooks, and
  * application settings are registered
  */
 class Application extends App {
-    const APP_ID = 'agreedisclaimer';
 
-    /** Preffix used for naming the txt and pdf files */
-    const FILE_PREFFIX = 'disclaimer';
+    /** @var string    Applications name */
+    private $appName;
 
-    /** Maximum file size in megabytes */
-    const FILE_SIZE_LIMIT = 3;
+    /** @var Config    Configuration settings */
+    private $config;
+
+    /** @var Utils    Helper functions */
+    private $utils;
 
     /**
      * Creates an Application object and registers its related services,
-     * user hooks, and settings 
+     * user hooks, and settings
      */
     public function __construct(array $urlParams=array()) {
-        parent::__construct(self::APP_ID, $urlParams);
+        //Instead of hardcoding the appName here, I get it from the folder where
+        //it is located, which in owncloud must be equal to the app's name
+        $this->appName = basename(dirname(__DIR__));
+        parent::__construct($this->appName, $urlParams);
+        $container = $this->getContainer();
+        $server = $container->getServer();
+        $l10n = $server->getL10N($this->appName);
+        $this->config = New Config(
+                                $this, 
+                                $server->getAppConfig(),
+                                $l10n,
+                                $server->getURLGenerator()
+                        );
+        $this->utils = New Utils($this, $l10n);
+    }
+
+    /**
+     * Registers all services
+     */
+    public function registerAll() {
         $this->registerServices();
         $this->registerHooks();
-        $this->registerSettings();
+        $this->config->registerAdminPage();
+    }
+
+    /**
+     * Gets the application's name 
+     *
+     * @return string The application's name
+     */
+    public function getAppName() {
+        return $appName;
     }
 
     /**
@@ -48,44 +79,56 @@ class Application extends App {
         /**
          * Registers the translation service
          */
-        $container->registerService('L10N', function($c) {
-            return $c->query('ServerContainer')->getL10N($c->query('AppName'));
-        });
+        $container->registerService(
+            'L10N', function(IAppContainer $c) {
+                return $c->getServer()->getL10N($this->appName);
+            }
+        );
+
+        /**
+         * Registers the logging service
+         */
+        $container->registerService(
+            'Logger', function($c) {
+                return $c->getServer()->getLogger();
+            }
+        );
 
         /**
          * Registers the controllers
          */
-        $container->registerService('SettingsController', function($c) {
-            return new SettingsController (
-                $c->query('AppName'),
-                $c->query('Request')
-            );
+        /*
+        $container->registerService(
+            'SettingsController', function($c) {
+                return new SettingsController (
+                    $c->query('AppName'),
+                    $c->query('Request')
+                );
+            }
         });
+        */
     }
 
     /**
-     * Registers all the application user hooks 
+     * Registers all the application user hooks
+     *
+     * @param IAppContainer $container  Application container
      */
-    public function registerHooks() {
+    public function registerHooks(IAppContainer $container) {
         $container = $this->getContainer();
 
         /**
          * Registers the preLogin hook to catch wether or not the user accepted
          * the disclaimer.
          */
+        /*
         $container->registerService('UserHooks', function($c) {
             return new UserHooks(
                 $c->query('ServerContainer')->getUserManager()
             );
         });
-        $this->getContainer()->query('UserHooks')->register(); 
-    }
-
-    /**
-     * Enables the application in the admin settings
-     */
-    public function registerSettings() {
-        \OCP\App::registerAdmin(self::APP_ID, 'admin');
+        $this->getContainer()->query('UserHooks')->register();
+        */
     }
 
     /**
@@ -94,127 +137,33 @@ class Application extends App {
      * @return OCP\AppFramework\Http\TemplateResponse   The response for the
      *         login template
      */
-    public function getDisclaimerForm(){
-        $appId = self::APP_ID;
-        $data = [
-            'appId' => $appId,
-        ];
-        $templateResponse = new TemplateResponse($appId, 'login', $data,
-            'blank');
+    public function getDisclaimerForm() {
+        $container = $this->getContainer();
+        $session = $container->query('OCP\IUserSession');
+        $templateResponse = null;
+        if (!$session->isLoggedIn()) {
+            $data = [
+                'appName' => $this->appName,
+            ];
+            $templateResponse = new TemplateResponse($this->appName, 'login',
+                                        $data, 'blank');
+        }
         return $templateResponse;
     }
 
     /**
-     * Gets all the available languages
-     *
-     * @param   string  $defaultLang    Current used language
-     *
-     * @return array    An array of the form: 
-     *     ['languages'       => <languages>,
-     *      'commonlanguages' => <common_languages>,
-     *      'activelanguage'  => <active_language>]
-     *     where:
-     *     - languages is an array with all the ownCloud languages (except the
-     *       common ones) of the form:
-     *          [['code' => <lang_code>, 'name' => <translated_lang_name], ...]
-     *     - commonlanguages is an array with the common ownCloud languages
-     *     - active_language is the current used language
-     *
-     * @remarks: This code was taken from:
-     *       * <ownCloudRoot>/settings/personal.php
-     *       Unfortunatelly there isn't an utility for this at the
-     *       moment of writting
+     * Gets the configuration of this application
+     * @return Config   The configuration object
      */
-    public static function getAvailableLanguages($defaultLang)
-    {
-        $config = \OC::$server->getConfig();
-        $userLang = $defaultLang;
-        $languageCodes = \OC_L10N::findAvailableLanguages();
-
-        // array of common languages
-        $commonlangcodes = array(
-            'en', 'es', 'fr', 'de', 'de_DE', 'ja', 'ar', 'ru', 'nl', 'it',
-            'pt_BR', 'pt_PT', 'da', 'fi_FI', 'nb_NO', 'sv', 'tr', 'zh_CN', 'ko'
-        );
-
-        $languageNames = include \OC::$SERVERROOT .
-            '/settings/languageCodes.php';
-        $languages = array();
-        $commonlanguages = array();
-        foreach($languageCodes as $lang) {
-            $l = \OC::$server->getL10N('settings', $lang);
-            if ( substr($l->t('__language_name__'), 0, 1) !== '_') {
-                //first check if the language name is in the translation file
-                $ln = array(
-                    'code' => $lang,
-                    'name' => (string)$l->t('__language_name__')
-                );
-            } elseif(isset($languageNames[$lang])) {
-                $ln=array('code' => $lang, 'name' => $languageNames[$lang]);
-                } else { //fallback to language code
-                $ln=array('code'=>$lang, 'name'=>$lang);
-            }
-
-            // put apropriate languages into apropriate arrays, to print them
-            // sorted used language -> common languages -> divider -> other
-            //languages
-            if ($lang === $userLang) {
-                $userLang = $ln;
-            } elseif (in_array($lang, $commonlangcodes)) {
-                $commonlanguages[array_search($lang, $commonlangcodes)]=$ln;
-            } else {
-                $languages[]=$ln;
-            }
-        }
-
-        ksort($commonlanguages);
-
-        // sort now by displayed language not the iso-code
-        usort($languages, function ($a, $b) {
-            return strcmp($a['name'], $b['name']);
-        });
-
-        return array(
-            'languages' => $languages,
-            'commonlanguages' => $commonlanguages,
-            'activelanguage' => $userLang,
-        );
+    public function getConfig() {
+        return $this->config;
     }
 
     /**
-     * Gets the absolute path of the application in the file system
-     *
-     * @return string   The absolute path of the application in the file system
+     * Gets the utility helpers
+     * @return Utils    The utility helpers
      */
-    public static function getAppPath() {
-        return \OC::$SERVERROOT . DIRECTORY_SEPARATOR . 'apps' .
-            DIRECTORY_SEPARATOR . self::APP_ID;
-    }
-
-    /**
-     * Gets the absolute path of the txt files with the disclaimer text
-     *
-     *
-     * @return string   The absolute path to the 'txt' folder
-     *
-     * @remarks: This files are located on a folder called: 'txt' inside the
-     *           application's absolute path
-     */
-    public static function getTxtFilesPath() {
-        $appPath = Application::getAppPath() . DIRECTORY_SEPARATOR;
-        return $appPath . 'txt';
-    }
-
-    /**
-     * Gets the absolute path of the pdf files with the disclaimer text
-     *
-     * @return string   The absolute path to the 'pdf' folder
-     *
-     * @remarks: This files are located on a folder called: 'pdf' inside the
-     *           application's absolute path
-     */
-    public static function getPdfFilesPath() {
-        $appPath = Application::getAppPath() . DIRECTORY_SEPARATOR;
-        return $appPath . 'pdf';
+    public function getUtils() {
+        return $this->utils;
     }
 }
