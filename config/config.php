@@ -44,8 +44,8 @@ class Config {
                         IL10N $l10n, IURLGenerator $urlGenerator) {
         $this->app = $app;
         $this->appConfig = $appConfig; 
-        $this->l10n = l10n;
-        $this->urlGenerator = urlGenerator;
+        $this->l10n = $l10n;
+        $this->urlGenerator = $urlGenerator;
 
         //Registers application parameters
         $container = $this->app->getContainer();
@@ -72,7 +72,8 @@ class Config {
      * @return mixed    The value of the specified setting
      */
     private function getProp($propName, $defValue = null) {
-        return $this->appConfig($this->app->getAppName, $propName, $defValue);
+        return $this->appConfig->getValue($this->app->getAppName, $propName,
+                                     $defValue);
     }
 
     /**
@@ -97,6 +98,47 @@ class Config {
         return $this->getProp('defaultLang', 'en');
     }
 
+    public function getFileName(&$fileExists, &$fileLang, &$fileError,
+                        $basePath, $filePreffix, $fileExt, $userLang,
+                        $defaultLang, $getFallbackLang) {
+        $fileName = $filePreffix . '_' . $userLang . '.' . $fileExt;
+        $filePath = $this->buildPath([$basePath, $fileName]);
+        $fileExists = file_exists($filePath);
+        $fileLang = $userLang;
+        $utils = $this->app->getUtils();
+        $langFallbacks = $utils->getFallbackLang($userLang);
+        $fileError = '';
+        if (!$fileExists) {
+            $fileError = $this->l10n->t('%s doesn\'t exist.',
+                             $fileLang . '<br/>') . ' ' .
+                             $this->l10n->t('Please contact the webmaster');
+            $languages = array();
+            if ($getFallbackLang) {
+                $languages = array_merge($languages, $langFallbacks);
+            }
+            if ($userLang !== $defaultLang) {
+                $languages[] = $defaultLang;
+            }
+            foreach ($languages as $langCode) {
+                $fileName = $filePreffix . '_' . $langCode . '.' . $fileExt;
+                $filePath = $this->buildPath([$basePath, $fileName]);
+                $fileExists = file_exists($filePath);
+                if ($fileExists) {
+                    $fileLang = $langCode;
+                    break;
+                }
+            }
+            if (!$fileExists && count($languages) > 1) {
+                $fileError = $this->l10n->t('Neither the file:' .
+                    ' %s nor: %s exist',
+                    ['<br/>'. $userLangFile. '<br/><br/>',
+                     '<br/>' . $filePath . '<br/><br/>']) . '. ' .
+                    \OCP\Util::getL10N($this->app->getAppName())
+                        ->t('Please contact the webmaster');
+            }
+        }
+    }
+
     /**
      * Gets the file info for the specified extension: file name, path,
      * contents, etc.. 
@@ -108,6 +150,7 @@ class Config {
      * @return array    An array with the txt file information
      */
     public function getFileData($fileExt, $getFallbackLang = true) {
+        $utils = $this->app->getUtils();
         $container = $this->app->getContainer();
         $fileInfo = [];
         $fileInfo['value'] = $this->getProp($fileExt . 'File', true);
@@ -120,10 +163,12 @@ class Config {
                         $basePath, $filePreffix, $fileExt, $userLang,
                         $defaultLang, $getFallbackLang);
         $fileInfo['name'] = $fileName;
-        $fileInfo['path'] = $basePath . DIRECTORY_SEPARATOR . $fileName;
+        $fileInfo['path'] = $this->buildPath([$basePath, $fileName]);
         $fileInfo['url'] = $this->urlGenerator->linkTo(
-                               $this->app->getAppName() . $fileExt . 
-                               DIRECTORY_SEPARATOR . $fileName
+                               $this->buildPath([
+                                   $this->app->getAppName() . $fileExt, 
+                                   $fileName
+                               ])
                            );
         $fileInfo['lang'] = $fileLang;
         $fileInfo['exist'] = $fileExists;
@@ -134,6 +179,19 @@ class Config {
 
             if ($fileExist) {
                 $fileContents = $this->getFileContents($fileError);
+                if ($file_contents === false) {
+                    //You have to use === otherwise the empty string will be
+                    //evaluated to false
+                    $fileError = $this->l10n->t('Could not read contents ' .
+                                    'from file: %s', $filePath) . '\n\n' .
+                               $this->l10n->t('Make sure that the file ' .
+                                    'exists and that it is readable by the '.
+                                    'apache user');
+                    //This ensures that carriage returns appear in a textarea
+                    $message = $utils->fixCarriageReturns($message);
+                    $file_contents = '';
+                    $fileError = $message; 
+                }
             } else {
                 $fileContents = '';
             }
@@ -153,7 +211,7 @@ class Config {
      * @return  array   An array with the file information
      */
     public function getTxtFileData($getFallbackLang) {
-        return getFileData('txt', $getFallbackLang);
+        return $this->getFileData('txt', $getFallbackLang);
     }
 
     /**
@@ -165,7 +223,7 @@ class Config {
      *
      * @return  array   An array with the file information
      */
-    public function getPpfFileData($getFallbackLang) {
-        return getFileData('pdf', $getFallbackLang);
+    public function getPdfFileData($getFallbackLang) {
+        return $this->getFileData('pdf', $getFallbackLang);
     }
 }

@@ -1,7 +1,7 @@
 /**
  * ownCloud - agreedisclaimer
  *
- * This file is licensed under the MIT License. See the COPYING file.
+ * This file is licensed under the MIT License. See the LICENSE file.
  *
  * @author Josef Meile <technosoftgratis@okidoki.com.co>
  * @copyright Josef Meile 2015

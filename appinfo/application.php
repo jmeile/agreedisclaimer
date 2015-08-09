@@ -36,9 +36,11 @@ class Application extends App {
      * user hooks, and settings
      */
     public function __construct(array $urlParams=array()) {
-        //Instead of hardcoding the appName here, I get it from the folder where
-        //it is located, which in owncloud must be equal to the app's name
-        $this->appName = basename(dirname(__DIR__));
+        //This won't work on symlinks; it will return the name of the linked
+        //folder, instead of the link's name, so, I had to hard code the app's
+        //name
+        //$this->appName = basename(dirname(__DIR__));
+        $this->appName = 'agreedisclaimer';
         parent::__construct($this->appName, $urlParams);
         $container = $this->getContainer();
         $server = $container->getServer();
@@ -57,7 +59,7 @@ class Application extends App {
      */
     public function registerAll() {
         $this->registerServices();
-        $this->registerHooks();
+        //$this->registerHooks();
         $this->config->registerAdminPage();
     }
 
@@ -67,7 +69,7 @@ class Application extends App {
      * @return string The application's name
      */
     public function getAppName() {
-        return $appName;
+        return $this->appName;
     }
 
     /**
@@ -81,7 +83,7 @@ class Application extends App {
          */
         $container->registerService(
             'L10N', function(IAppContainer $c) {
-                return $c->getServer()->getL10N($this->appName);
+                return $c->getServer()->getL10N($c->query('AppName'));
             }
         );
 
@@ -121,14 +123,12 @@ class Application extends App {
          * Registers the preLogin hook to catch wether or not the user accepted
          * the disclaimer.
          */
-        /*
         $container->registerService('UserHooks', function($c) {
             return new UserHooks(
                 $c->query('ServerContainer')->getUserManager()
             );
         });
         $this->getContainer()->query('UserHooks')->register();
-        */
     }
 
     /**
