@@ -72,7 +72,7 @@ class Config {
      * @return mixed    The value of the specified setting
      */
     private function getProp($propName, $defValue = null) {
-        return $this->appConfig->getValue($this->app->getAppName, $propName,
+        return $this->appConfig->getValue($this->app->getAppName(), $propName,
                                      $defValue);
     }
 
@@ -98,9 +98,27 @@ class Config {
         return $this->getProp('defaultLang', 'en');
     }
 
+    /**
+     * Gets the file name of the specified user language.
+     *
+     * @param bool   $fileExists          Returns either if the file exists or
+     *                   not
+     * @param string $fileLang            Returned file language
+     * @param string $fileError           Return error message
+     * @param string $basePath            Base path of the file to get
+     * @param string $filePreffix         Name preffix of the file
+     * @param string $fileExt             Extension of the file to get
+     * @param string $userLang            Current user language
+     * @param string $defaultLang         Default language for the disclaimer
+     * @param bool   $getFallbackLang     Whether or not to get the fallback
+     *                   language in case that the user or the default
+     *                   languages doesn't exist.
+     * @param bool   $isAdminPage         Wheter or not is the admin page
+     */
     public function getFileName(&$fileExists, &$fileLang, &$fileError,
                         $basePath, $filePreffix, $fileExt, $userLang,
-                        $defaultLang, $getFallbackLang) {
+                        $defaultLang, $getFallbackLang = true,
+                        $isAdminPage = false) {
         $fileName = $filePreffix . '_' . $userLang . '.' . $fileExt;
         $filePath = $this->buildPath([$basePath, $fileName]);
         $fileExists = file_exists($filePath);
@@ -108,10 +126,16 @@ class Config {
         $utils = $this->app->getUtils();
         $langFallbacks = $utils->getFallbackLang($userLang);
         $fileError = '';
+        $newLine = '<br/>';
+        if ($isAdminPage) {
+            $newLine = '\r\n';
+        }
         if (!$fileExists) {
-            $fileError = $this->l10n->t('%s doesn\'t exist.',
-                             $fileLang . '<br/>') . ' ' .
+            $userLangFile = $filePath;
+            $fileError = $this->l10n->t('%s doesn\'t exist',
+                             $newLine . $filePath . $newLine) . '. ' .
                              $this->l10n->t('Please contact the webmaster');
+            $fileError = $utils->fixCarriageReturns($fileError);
             $languages = array();
             if ($getFallbackLang) {
                 $languages = array_merge($languages, $langFallbacks);
@@ -125,6 +149,7 @@ class Config {
                 $fileExists = file_exists($filePath);
                 if ($fileExists) {
                     $fileLang = $langCode;
+                    $fileError = '';
                     break;
                 }
             }
@@ -137,93 +162,150 @@ class Config {
                         ->t('Please contact the webmaster');
             }
         }
+        return $fileName;
     }
 
     /**
      * Gets the file info for the specified extension: file name, path,
      * contents, etc.. 
      *
-     * @param bool  $getFallbackLang    Whether or not to get the fallback
-     *                  language in case that the user or the default languages
-     *                  doesn't exist.
+     * @param string $fileExt            Extension of the file to get
+     * @param bool   $getFallbackLang    Whether or not to get the fallback
+     *                   language in case that the user or the default languages
+     *                   doesn't exist.
+     * @param bool   $isAdminPage        Whether or not is the admin page
+     * @param string $defaultLang        Default language. If null, it will
+     *                   be adquired get from the app's configuration. Note that
+     *                   it is only necessary pass this parameter on the admin
+     *                   page while changing the default language. The reason of
+     *                   this is that somethimes the ajax request that sets the
+     *                   default language occurs after getting the info of the
+     *                   file
      *
      * @return array    An array with the txt file information
      */
-    public function getFileData($fileExt, $getFallbackLang = true) {
+    public function getFileData($fileExt, $getFallbackLang = true,
+                        $isAdminPage = false, $defaultLang = null) {
         $utils = $this->app->getUtils();
         $container = $this->app->getContainer();
         $fileInfo = [];
-        $fileInfo['value'] = $this->getProp($fileExt . 'File', true);
+        $fileInfo['value'] = $utils->strToBool(
+                                 $this->getProp($fileExt . 'File', true)
+                             );
         $basePath = $container->query($fileExt . 'BasePath');
         $fileInfo['basePath'] = $basePath;
         $filePreffix = $container->query('filePreffix');
         $userLang = $this->l10n->getLanguageCode();
-        $defaultLang = $this->getDefaultLang();
+
+        if ($defaultLang === null){
+            $defaultLang = $this->getDefaultLang();
+        }
+
+        if ($isAdminPage) {
+            //For the admin page only the default language will be retreived
+            $userLang = $defaultLang;
+        }
         $fileName = $this->getFileName($fileExists, $fileLang, $fileError,
                         $basePath, $filePreffix, $fileExt, $userLang,
-                        $defaultLang, $getFallbackLang);
+                        $defaultLang, $getFallbackLang, $isAdminPage);
         $fileInfo['name'] = $fileName;
         $fileInfo['path'] = $this->buildPath([$basePath, $fileName]);
         $fileInfo['url'] = $this->urlGenerator->linkTo(
-                               $this->buildPath([
-                                   $this->app->getAppName() . $fileExt, 
-                                   $fileName
-                               ])
+                               $this->app->getAppName(),
+                               $this->buildPath([$fileExt, $fileName])
                            );
         $fileInfo['lang'] = $fileLang;
-        $fileInfo['exist'] = $fileExists;
+        $fileInfo['exists'] = $fileExists;
 
         if ($fileExt === 'txt') {
             $fileInfo['maxAppSize'] = $container->query('maxAppTxtFileSize');
-            $fileInfo['maxAdminSize'] = $this->getProp('maxAdminSize', 1);
+            $fileInfo['maxAdminSize'] = $this->getProp('maxAdminTxtSize', 1);
 
-            if ($fileExist) {
-                $fileContents = $this->getFileContents($fileError);
-                if ($file_contents === false) {
-                    //You have to use === otherwise the empty string will be
-                    //evaluated to false
-                    $fileError = $this->l10n->t('Could not read contents ' .
-                                    'from file: %s', $filePath) . '\n\n' .
-                               $this->l10n->t('Make sure that the file ' .
-                                    'exists and that it is readable by the '.
-                                    'apache user');
-                    //This ensures that carriage returns appear in a textarea
-                    $message = $utils->fixCarriageReturns($message);
-                    $file_contents = '';
-                    $fileError = $message; 
-                }
+            if ($fileExists) {
+                $fileContents = $this->getFileContents($fileInfo['path'],
+                                    $fileInfo['maxAdminSize'], $fileError,
+                                    $isAdminPage);
             } else {
                 $fileContents = '';
             }
             $fileInfo['contents'] = $fileContents;
+        } else {
+            $fileInfo['icon'] = $this->urlGenerator->linkTo(
+                                    $this->app->getAppName(),
+                                    $this->buildPath(['pdf', 'icon.png'])
+                                );
         }
         $fileInfo['error'] = $fileError;
-        return fileInfo;
+        return $fileInfo;
+    }
+
+    /**
+     * Gets the contents of a text file
+     *
+     * @param string $filePath       Path of the file to read
+     * @param int    $maxFileSize    Maximun megabytes to read
+     * @param string $fileError      Returned error message
+     * @param bool   $isAdminPage    Whether or not is the admin page
+     *
+     * @return string    The file contents
+     */
+    function getFileContents($filePath, $maxFileSize, &$fileError,
+                 $isAdminPage = false) {
+        $newLine = '<br/>';
+        if ($isAdminPage) {
+            $newLine = '\r\n';
+        }
+        $maxBytes = $maxFileSize * 1048576; 
+        $fileContents = file_get_contents($filePath, false, null, 0, $maxBytes);
+        if ($fileContents === false) {
+            //You have to use === otherwise the empty string will be
+            //evaluated to false
+            $fileError = $this->l10n->t('Could not read contents ' .
+                            'from file: %s', $filePath) . $newLine . $newLine .
+                         $this->l10n->t('Make sure that the file ' .
+                            'exists and that it is readable by the '.
+                            'apache user');
+            //This ensures that carriage returns appear in a textarea
+            $utils = $this->app->getUtils();
+            $fileError = $utils->fixCarriageReturns($fileError);
+            $fileContents = '';
+        }
+        return $fileContents;
     }
 
     /**
      * Gets the information for the txt file
      *
-     * @param bool  $getFallbackLang    Whether or not to get the fallback
-     *                  language in case that the user or the default languages
-     *                  doesn't exist.
+     * @param bool    $getFallbackLang    Whether or not to get the fallback
+     *                    language in case that the user or the default
+     *                    languages doesn't exist.
+     * @param bool    $isAdminPage        Whether or not is the admin page
+     * @param string $defaultLang         Default language. If null, it will
+     *                   be gotten from the app's config
      *
      * @return  array   An array with the file information
      */
-    public function getTxtFileData($getFallbackLang) {
-        return $this->getFileData('txt', $getFallbackLang);
+    public function getTxtFileData($getFallbackLang = true,
+                        $isAdminPage = false, $defaultLang = null) {
+        return $this->getFileData('txt', $getFallbackLang, $isAdminPage,
+                   $defaultLang);
     }
 
     /**
      * Gets the information for the pdf file
      *
-     * @param bool  $getFallbackLang    Whether or not to get the fallback
-     *                  language in case that the user or the default languages
-     *                  doesn't exist.
+     * @param bool    $getFallbackLang    Whether or not to get the fallback
+     *                    language in case that the user or the default
+     *                    languages doesn't exist.
+     * @param bool    $isAdminPage        Whether or not is the admin page
+     * @param string $defaultLang         Default language. If null, it will
+     *                   be gotten from the app's config
      *
      * @return  array   An array with the file information
      */
-    public function getPdfFileData($getFallbackLang) {
-        return $this->getFileData('pdf', $getFallbackLang);
+    public function getPdfFileData($getFallbackLang = true,
+                        $isAdminPage = false, $defaultLang = null) {
+        return $this->getFileData('pdf', $getFallbackLang, $isAdminPage,
+                   $defaultLang);
     }
 }

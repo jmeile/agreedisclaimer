@@ -12,7 +12,7 @@
  */
 $(document).ready(function(){
     'use strict';
-    var appName = $('#appName').val(); 
+    var appName = 'agreedisclaimer'; 
 
     //Application settings
     var pdfFileProp = appName + 'PdfFile';
@@ -22,8 +22,8 @@ $(document).ready(function(){
     var txtFilePathProp = txtFileProp + 'Path';
     var maxAdminTxtSizeProp = appName + 'MaxAdminTxtSize';
     var maxAppTxtSize = parseInt(
-                               $('#' + appName + 'MaxAppTxtSize').val()
-                           );
+                            $('#' + appName + 'MaxAppTxtSize').val()
+                        );
     var defaultLangProp = appName + 'DefaultLang';
 
     /**
@@ -96,7 +96,7 @@ $(document).ready(function(){
     $('#' + defaultLangProp).on('change', function(){
         var propValue = $(this).val();
         OC.AppConfig.setValue(appName, 'defaultLang', propValue);
-        //reloadFileInfo(propValue);
+        reloadFileInfo(propValue);
     });
 
     /**
@@ -116,24 +116,24 @@ $(document).ready(function(){
             },
             contentType: 'application/json; charset=utf-8',
             success: function(files) {
-                if (files['txtFile']['error'] === '') {
+                if (files['txtFileData']['error'] === '') {
                     $('#' + txtFileContentsProp).html(
-                        files['txtFile']['content']
+                        files['txtFileData']['contents']
                      );
                 } else {
                     $('#' + txtFileContentsProp).html(
-                        files['txtFile']['error']
+                        files['txtFileData']['error']
                      );
                 }
-                $('#' + txtFilePathProp).html(files['txtFile']['path']);
+                $('#' + txtFilePathProp).html(files['txtFileData']['path']);
 
-                if (files['pdfFile']['error'] === '') {
-                    var pdfLink = files['pdfFile']['url'];
+                if (files['pdfFileData']['error'] === '') {
+                    var pdfLink = files['pdfFileData']['url'];
                     pdfLink = '<a href="' + pdfLink + '" target="_blank">' +
-                        files['pdfFile']['name'] +'</a>';
+                        files['pdfFileData']['name'] +'</a>';
                     $('#' + pdfFileUrlProp).html(pdfLink);
                 } else {
-                    $('#' + pdfFileUrlProp).html(files['pdfFile']['error']);
+                    $('#' + pdfFileUrlProp).html(files['pdfFileData']['error']);
                 }
             }
         });
@@ -154,7 +154,7 @@ $(document).ready(function(){
             $(this).val(1);
         }
         OC.AppConfig.setValue(appName, 'maxAdminTxtSize', propValue);
-        //reloadFileInfo($('#' + defaultLangProp).val());
+        reloadFileInfo($('#' + defaultLangProp).val());
     });
 
     /**

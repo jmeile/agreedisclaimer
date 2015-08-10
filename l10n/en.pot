@@ -10,6 +10,9 @@
     "Agree disclaimer":
     "",
 
+    "Could not read contents from file: %s":
+    "",
+
     "Contents of the file":
     "",
 
@@ -43,13 +46,16 @@
     "If the text file is bigger than this size, then its contents won't appear completely in the dialog, so, adjust the size till it is adequate to your needs":
     "",
 
-    "If you want to modify this limit, do it at your own risk by changing the value of FILE_SIZE_LIMIT inside the Application.php file":
+    "If you want to modify this limit, do it at your own risk by changing the value of the parameter: maxAppTxtFileSize inside the config.php file":
     "",
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "",
 
     "Likewise put your pdf files under":
+    "",
+
+    "Make sure that the file exists and that it is readable by the apache user":
     "",
 
     "Maximum file size in megabytes for the text file":

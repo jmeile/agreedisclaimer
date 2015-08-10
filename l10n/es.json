@@ -17,6 +17,9 @@
     "Continue":
     "Continuar",
 
+    "Could not read contents from file: %s":
+    "No se pudo leer el archivo: %s",
+
     "Current PDF":
     "PDF actual",
 
@@ -44,14 +47,17 @@
     "If the text file is bigger than this size, then its contents won't appear completely in the dialog, so, adjust the size till it is adequate to your needs":
     "Si el archivo de texto es más grande que este tamaño, sus contenidos no serán mostrados completamente en el diálogo; ajúste este valor hasta que sea adecuado a sus necesidades",
 
-    "If you want to modify this limit, do it at your own risk by changing the value of FILE_SIZE_LIMIT inside the Application.php file":
-    "Si usted quiere modificar este límite, hágalo bajo su propia responsabilidad cambiando el valor de FILE_SIZE_LIMIT dentro del archivo Application.php",
+    "If you want to modify this limit, do it at your own risk by changing the value of the parameter: maxAppTxtFileSize inside the config.php file":
+    "Si usted quiere modificar este límite, hágalo bajo su propia responsabilidad cambiando el valor del parámetro: maxAppTxtFileSize dentro del archivo config.php",
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "En caso de que el archivo para el idioma por defecto no exista, el usuario verá un error al intentar leer el texto",
 
     "Likewise put your pdf files under":
     "De modo similar, guarde sus archivos pdf en",
+
+    "Make sure that the file exists and that it is readable by the apache user":
+    "Asegúrese de que el archivo existe y puede ser leído por el usuario de apache",
 
     "Maximum file size in megabytes for the text file":
     "Tamaño máximo del archivo de texto en megabytes",

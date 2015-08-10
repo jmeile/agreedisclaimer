@@ -31,21 +31,20 @@ script($_['appName'], 'admin');
 * Adds the style sheets file to the settings page
 */
 style($_['appName'], 'admin');
+
 ?>
 
 <div class="section" id="<?php p($_['appName']); ?>">
 <h2><?php p($l->t('Agree disclaimer')); ?></h2>
-<input id="appName" type="hidden"
-       value="<?php p($_['appName']); ?>"/>
 <input id="<?php p($maxAppTxtSizeProp); ?>" type="hidden"
-       value="<?php p($_['maxAppSize']); ?>"/>
+       value="<?php p($_['txtFileData']['maxAppSize']); ?>"/>
 <label for="<?php p($defaultLangProp); ?>">
     <?php p($l->t('Default language for the text')); ?>
 </label>&nbsp;
 <select id="<?php p($defaultLangProp); ?>"
     name="<?php p($defaultLangProp); ?>">
-    <option value="<?php p($_['currentLanguage']['code']); ?>">
-        <?php p($_['currentLanguage']['name']); ?>
+    <option value="<?php p($_['currentLang']['code']); ?>">
+        <?php p($_['currentLang']['name']); ?>
     </option>
     <?php foreach($_['commonLanguages'] as $language): ?>
         <option value="<?php p($language['code']); ?>">
@@ -66,7 +65,7 @@ style($_['appName'], 'admin');
     <?php p($l->t('To enable more languages, put your text files '.
                   'here')); ?>:
     <br/>
-    <b><?php p($_['txtFileData  ']['basePath'] . '/');
+    <b><?php p($_['txtFileData']['basePath'] . '/');
          p($_['filePreffix']); ?>_&lt;lang_code&gt;.txt</b><br/>
     <?php p($l->t('Where')); ?>:<br/>
     <ul>
@@ -119,8 +118,8 @@ style($_['appName'], 'admin');
                       'setting higher values that will make ownCloud to ' .
                       'crash', $_['txtFileData']['maxAppSize']) . '. ');
               p($l->t('If you want to modify this limit, do it at your own ' .
-                      'risk by changing the value of FILE_SIZE_LIMIT inside '.
-                      'the Application.php file') . '.');
+                      'risk by changing the value of the parameter: ' .
+                      'maxAppTxtFileSize inside the config.php file') . '.');
         ?><br/><br/>
     </div>
     <?php p($l->t('Contents of the file')); ?>:<br/>
@@ -130,17 +129,30 @@ style($_['appName'], 'admin');
     <br/>
     <textarea readonly id="<?php p($txtFileContentsProp); ?>"
               class="<?php p($_['appName']); ?>_disabled_input" rows="7"
-    ><?php p($_['txtFileData']['contents']); ?></textarea>
+    ><?php
+          if ($_['txtFileData']['error'] !== '') {
+              p($_['txtFileData']['error']);
+          } else {
+              p($_['txtFileData']['contents']);
+          }
+      ?></textarea>
     <br/>
     <input type="checkbox" id="<?php p($pdfFileProp); ?>"
            name="<?php p($pdfFileProp); ?>"
-           <?php if ($_['pdfData']['value']) p('checked'); ?>/>
+           <?php if ($_['pdfFileData']['value']) p('checked'); ?>/>
     <label for="<?php p($pdfFileProp); ?>">
         <?php p($l->t('Show a link to a PDF file with the disclaimer')); ?>
     </label><br/>
     <?php p($l->t('Current PDF')); ?>:
     <span id="<?php p($pdfFileUrlProp); ?>">
-        <?php print_unescaped($_['pdfFileData']['url']); ?>
+        <?php
+            if ($_['pdfFileData']['error'] !== '') {
+                p($_['pdfFileData']['error']);
+            } else {
+                print_unescaped('<a href="' . $_['pdfFileData']['url'] . '"' .
+                    'target="_blank">' . $_['pdfFileData']['name'] . '</a>');
+            }
+        ?>
     </span>
 </div>
 <div id="<?php p($_['appName']); ?>ErrorDialog"

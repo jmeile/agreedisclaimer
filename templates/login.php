@@ -12,6 +12,20 @@
  * Template that will be rendered on the login page
  */
 
+/**
+ * Adds the javascript utilities to the login page
+ */
+script($_['appName'], 'utils');
+
+/**
+ * Adds the javascript to the login page
+ */
+script($_['appName'], 'login');
+
+/**
+ * Adds the style sheets file to the login page
+ */
+style($_['appName'], 'login');
 ?>
 
 <!-- Every html code after this gets ignored :-(

@@ -12,52 +12,53 @@
  */
 $(document).ready(function(){
     'use strict';
+    var appName = 'agreedisclaimer';
 
-    var appId = 'agreedisclaimer';
+    //Application settings
     var showTxt;
-    var txtFileProp = appId + 'TxtFile';
+    var txtFileProp = appName + 'TxtFile';
     var txtContents;
     var showPdf;
-    var pdfFileProp = appId + 'PdfFile';
+    var pdfFileProp = appName + 'PdfFile';
     var pdfLink;
     var pdfPath;
     var pdfIcon;
     var errorPdf;
 
     /**
-     * Ajax request for calling the settings#get_settings route
+     * Ajax request for calling the settings#get_files route
      */
-    var baseUrl = OC.generateUrl('/apps/' + appId + '/settings/get_all');
+    var baseUrl = OC.generateUrl('/apps/' + appName + '/settings/get_files');
     $.ajax({
-        type: 'GET',
         url: baseUrl,
+        type: 'GET',
         async: false,
-        success: function(settings) {
-            var adminSettings = settings['adminSettings'];
-            showTxt = adminSettings[txtFileProp]['value'];
-            showPdf = adminSettings[pdfFileProp]['value'];
+        contentType: 'application/json; charset=utf-8',
+        success: function(files) {
+            showTxt = files['txtFileData']['value'];
+            showPdf = files['pdfFileData']['value'];
 
-            if (showTxt === 'true') {
-                if (adminSettings[txtFileProp]['file']['error'] === '') {
+            if (showTxt) {
+                if (files['txtFileData']['error'] === '') {
                     //If there weren't any error, the file contents will be
                     //shown
-                    txtContents = adminSettings[txtFileProp]['file']['content'];
+                    txtContents = files['txtFileData']['contents'];
                 } else {
                     //Otherwise an error will be displayed
-                    txtContents = adminSettings[txtFileProp]['file']['error'];
+                    txtContents = files['txtFileData']['error'];
                 }
             }
 
-            if (showPdf === 'true') {
-                pdfIcon = settings['pdfIcon'];
+            if (showPdf) {
+                pdfIcon = files['pdfFileData']['icon'];
                 errorPdf = false;
-                if (adminSettings[pdfFileProp]['file']['error'] === '') {
+                if (files['pdfFileData']['error'] === '') {
                     //If there weren't any error, a link to the pdf will be
                     //shown
-                    pdfPath = adminSettings[pdfFileProp]['file']['url'];
+                    pdfPath = files['pdfFileData']['url'];
                 } else {
                     //Otherwise an error will be displayed
-                    pdfPath = adminSettings[pdfFileProp]['file']['error'];
+                    pdfPath = files['pdfFileData']['error']; 
                     errorPdf = true;
                 }
             }
@@ -77,15 +78,15 @@ $(document).ready(function(){
         $('#password').parent().removeClass("groupbottom");
         $('#password').parent().addClass("groupmiddle");
 
-        var text = t(appId, 'I have read and understood the ' +
+        var text = t(appName, 'I have read and understood the ' +
             '%s1disclaimer of liability%s2');
         var keywords;
-        if (showTxt === 'true') {
+        if (showTxt) {
             //If the link to the txt file is supposed to be shown, the
             //placeholders: '%s1' and '%s2' will be used to render an html
             //anchor (<a> html tag)
             keywords = {
-                '%s1': '<a id="' + appId + 'Link">',
+                '%s1': '<a id="' + appName + 'Link">',
                 '%s2': '</a>'
             }
         } else {
@@ -98,14 +99,14 @@ $(document).ready(function(){
         text = multiple_replace(text, keywords); 
 
         pdfLink = '';
-        if (showPdf === 'true') {
-            pdfLink = '    <a id="' + appId + 'PdfLink" ';
+        if (showPdf) {
+            pdfLink = '    <a id="' + appName + 'PdfLink" ';
             if (!errorPdf) {
                 //If the pdf file exist, then a link to it will be rendered;
                 //otherwise, an error will be shown when clicking on it (see
-                //the definition of the  "$('#' + appId + 'PdfLink').click"
+                //the definition of the  "$('#' + appName + 'PdfLink').click"
                 //event
-                pdfLink = pdfLink + 'href="' + pdfPath + '"';
+                pdfLink = pdfLink + 'target="_blank" href="' + pdfPath + '"';
             }
             //The link is closed and the pdf icon is attached
             pdfLink = pdfLink + '>\n' +
@@ -115,11 +116,11 @@ $(document).ready(function(){
         
         //Now we join everything together and add it after the parent of the
         //password field
-        var disclaimerHtml = '<div class="' + appId + '">\n' +
-                             '    <input id="' + appId + 'Checkbox" ' +
-                                        'name="' + appId + 'Checkbox" ' +
+        var disclaimerHtml = '<div class="' + appName + '">\n' +
+                             '    <input id="' + appName + 'Checkbox" ' +
+                                        'name="' + appName + 'Checkbox" ' +
                                         'type="checkbox"/>\n' +
-                             '    <div id="' + appId + 'Div">\n' +
+                             '    <div id="' + appName + 'Div">\n' +
                              '        ' + text + '\n' +
                              '    </div>\n' + 
                                   pdfLink +
@@ -128,11 +129,11 @@ $(document).ready(function(){
     }
     injectDisclaimer();
 
-    if (showPdf === 'false') {
+    if (!showPdf) {
         //If the pdf link isn't going to be displayed, then the width of for the
         //disclaimer notice will be increased. The space for the pdf icon will
         //be available since this image won't be shown
-        $('#' + appId + 'Div').width('215px');
+        $('#' + appName + 'Div').width('215px');
     }
 
     /**
@@ -144,9 +145,9 @@ $(document).ready(function(){
      */
     function injectErrorPdfDialog(pdfError){
         var dialogHtml;
-        var title = t(appId, 'File not found');
+        var title = t(appName, 'File not found');
 
-        dialogHtml = '<div id="' + appId + 'ErrorDialog"\n' + 
+        dialogHtml = '<div id="' + appName + 'ErrorDialog"\n' + 
                      '     title="' + title + '">\n' +
                      '    <p>\n' +
                      '        ' + pdfError + '\n' +
@@ -159,7 +160,7 @@ $(document).ready(function(){
         //If the pdf file doesn't exist or there is a permissions error, then
         //the error dialog will be injected
         injectErrorPdfDialog(pdfPath);
-        $('#' + appId + 'ErrorDialog').dialog({
+        $('#' + appName + 'ErrorDialog').dialog({
             autoOpen: false,
             width: 'auto',
             resizable: false,
@@ -167,7 +168,7 @@ $(document).ready(function(){
             closeText: 'Close',
             buttons: [
                 {
-                    text: t(appId, 'Ok'),
+                    text: t(appName, 'Ok'),
                     click: function() {
                         $(this).dialog('close');
                     }
@@ -176,8 +177,8 @@ $(document).ready(function(){
         });
 
         //The pdf link will open the error dialog
-        $('#' + appId + 'PdfLink').click(function(e) {
-            $('#' + appId + 'ErrorDialog').dialog('open');
+        $('#' + appName + 'PdfLink').click(function(e) {
+            $('#' + appName + 'ErrorDialog').dialog('open');
             e.preventDefault;
         });
     }
@@ -189,9 +190,9 @@ $(document).ready(function(){
      */
     function injectDisclaimerDialog(disclaimerText) {
         var dialogHtml;
-        var title = t(appId, 'Disclaimer of liability');
+        var title = t(appName, 'Disclaimer of liability');
 
-        dialogHtml = '<div id="' + appId + 'Dialog"\n' + 
+        dialogHtml = '<div id="' + appName + 'Dialog"\n' + 
                      '     title="' + title + '">\n' +
                      '    <p>\n' +
                      '        ' + disclaimerText + '\n' +
@@ -200,11 +201,11 @@ $(document).ready(function(){
         $('body').append(dialogHtml);
     }
     
-    if (showTxt === 'true') {
+    if (showTxt) {
         //If the txt link is active, then the dialog with the disclaimer's text
         //will be injected
         injectDisclaimerDialog(txtContents);
-        $('#' + appId + 'Dialog').dialog({
+        $('#' + appName + 'Dialog').dialog({
             autoOpen: false,
             width: 550,
             resizable: false,
@@ -212,16 +213,16 @@ $(document).ready(function(){
             closeText: 'Close',
             buttons: [
                 {
-                    text: t(appId, 'Agree'),
+                    text: t(appName, 'Agree'),
                     click: function() {
-                        $('#' + appId + 'Checkbox').attr('checked', true);
+                        $('#' + appName + 'Checkbox').attr('checked', true);
                         $(this).dialog('close');
                     }
                 },
                 {
-                    text: t(appId, 'Decline'),
+                    text: t(appName, 'Decline'),
                     click: function() {
-                        $('#' + appId + 'Checkbox').removeAttr('checked');
+                        $('#' + appName + 'Checkbox').removeAttr('checked');
                         $(this).dialog('close');
                     }
                 }
@@ -230,10 +231,10 @@ $(document).ready(function(){
 
         /**
          * Shows the disclaimer's text when cliking on the link:
-         * <appId>Link
+         * <appName>Link
          */
-        $('#' + appId + 'Link').click(function(e) {
-            $('#' + appId + 'Dialog').dialog('open');
+        $('#' + appName + 'Link').click(function(e) {
+            $('#' + appName + 'Dialog').dialog('open');
             e.preventDefault;
         });
     }

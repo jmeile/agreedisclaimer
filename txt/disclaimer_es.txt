@@ -1,0 +1,11 @@
+Por favor tenga en cuenta que este servicio no está concebido como una solución
+para la copia de seguridad de datos. Su propósito es compartir temporalmente
+archivos entre dos o más usuarios. No nos hacemos responsables por la pérdida de
+los datos; el usuario es responsable de hacer copias de seguridad de sus
+archivos.<br><br>
+
+Esta aplicación deberá usarse solo para intercambiar contenido legal. El usuario
+es responsable en cualquier caso de violación de alguna ley vigente.<br><br>
+
+Al Hacer clic en el botón "Aceptar", confirmo que he leído, entendido y aceptado
+estas condiciones.

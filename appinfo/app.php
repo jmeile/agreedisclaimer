@@ -16,10 +16,9 @@ namespace OCA\AgreeDisclaimer\AppInfo;
 
 $app = new Application();
 $app->registerAll();
-/*
+
 $templateResponse = $app->getDisclaimerForm();
 if ($templateResponse !== null){
     //The template won't be returned if the user is already logged in
     return $templateResponse->render();
 }
-*/

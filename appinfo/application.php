@@ -13,6 +13,8 @@ use OCP\AppFramework\IAppContainer;
 
 use OCP\AppFramework\Http\TemplateResponse;
 
+use OCA\AgreeDisclaimer\Hooks\UserHooks;
+use OCA\AgreeDisclaimer\Controller\SettingsController;
 use OCA\AgreeDisclaimer\Config\Config;
 use OCA\AgreeDisclaimer\Utils;
 
@@ -24,6 +26,8 @@ class Application extends App {
 
     /** @var string    Applications name */
     private $appName;
+
+    private $l10n;
 
     /** @var Config    Configuration settings */
     private $config;
@@ -44,14 +48,14 @@ class Application extends App {
         parent::__construct($this->appName, $urlParams);
         $container = $this->getContainer();
         $server = $container->getServer();
-        $l10n = $server->getL10N($this->appName);
+        $this->l10n = $server->getL10N($this->appName);
         $this->config = New Config(
                                 $this, 
                                 $server->getAppConfig(),
-                                $l10n,
+                                $this->l10n,
                                 $server->getURLGenerator()
                         );
-        $this->utils = New Utils($this, $l10n);
+        $this->utils = New Utils($this, $this->l10n);
     }
 
     /**
@@ -59,7 +63,7 @@ class Application extends App {
      */
     public function registerAll() {
         $this->registerServices();
-        //$this->registerHooks();
+        $this->registerHooks();
         $this->config->registerAdminPage();
     }
 
@@ -99,24 +103,22 @@ class Application extends App {
         /**
          * Registers the controllers
          */
-        /*
         $container->registerService(
             'SettingsController', function($c) {
                 return new SettingsController (
                     $c->query('AppName'),
-                    $c->query('Request')
+                    $c->query('Request'),
+                    $c->getServer()->getL10N($c->query('AppName')),
+                    $this->config
                 );
             }
-        });
-        */
+        );
     }
 
     /**
      * Registers all the application user hooks
-     *
-     * @param IAppContainer $container  Application container
      */
-    public function registerHooks(IAppContainer $container) {
+    public function registerHooks() {
         $container = $this->getContainer();
 
         /**
@@ -125,10 +127,11 @@ class Application extends App {
          */
         $container->registerService('UserHooks', function($c) {
             return new UserHooks(
-                $c->query('ServerContainer')->getUserManager()
+                $c->query('ServerContainer')->getUserManager(),
+                $c->getServer()->getL10N($c->query('AppName'))
             );
         });
-        $this->getContainer()->query('UserHooks')->register();
+        $this->getContainer()->query('UserHooks')->register($this->appName);
     }
 
     /**
@@ -142,8 +145,38 @@ class Application extends App {
         $session = $container->query('OCP\IUserSession');
         $templateResponse = null;
         if (!$session->isLoggedIn()) {
+            $userLang = $this->l10n->getLanguageCode();
+
+            //Fix it: No way of getting rid of this static call. There is no
+            //class method on OwnCloud that does this
+            if (!\OC_L10N::languageExists($this->appName, $userLang)) {
+                //It can be that some language dialects hasn't being translated,
+                //so, a suitable language will be searched. ie: if 'de_CH' isn't
+                //available, then 'de_DE' (formal german) will be used. In case
+                //that 'de_DE' isn't available, then 'de' (informal german will
+                //be used). If no fallback language is found, then the defined
+                //default language will be used. In case nothing is found, then
+                //ownCloud will decide which language to use, which in most
+                //cases is 'en'.
+                $langFallbacks = $this->utils->getFallbackLang($userLang);
+                $defaultLang = $this->config->getDefaultLang();
+                if ($defaultLang !== $userLang) {
+                    $langFallbacks[] = $defaultLang;
+                }
+
+                foreach ($langFallbacks as $langCode) {
+                    //Fix it: again, no way of getting rid of this static calls;
+                    //the ownCloud library doesn't have any other way
+                    if (\OC_L10N::languageExists($this->appName, $langCode)) {
+                        $userLang = $langCode;
+                        \OC_L10N::forceLanguage($userLang);
+                        break;
+                    }
+                }
+            }
+
             $data = [
-                'appName' => $this->appName,
+                'appName'   => $this->appName,
             ];
             $templateResponse = new TemplateResponse($this->appName, 'login',
                                         $data, 'blank');

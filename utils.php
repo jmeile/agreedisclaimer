@@ -174,4 +174,16 @@ class Utils {
             'activelanguage' => $userLang,
         );
     }
+
+    /**
+     * Converts a string to its boolean value
+     *
+     * @param string $str   The string to convert
+     *
+     * @return bool    The boolean value of the string
+     */
+    public function strToBool($str) {
+        $str = strtolower($str);
+        return in_array($str, ['0', 'false', '', false, null]) ? false : true;
+    }
 }
