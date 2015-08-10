@@ -12,9 +12,17 @@
  */
 
 /**
+ * Does multiple string replacement in the entered string
+ *
  * Code taken from:
  * find multiple key words within a dictionary Javascript, answer by Rob W
  * http://stackoverflow.com/questions/8413651/find-multiple-key-words-within-a-dictionary-javascript
+ *
+ * @param string str    String where the replacements are going to be done
+ * @param object keywors    Keywords and its replacements, ie:
+ *                          {"blue": "red", "yellow": "orange} will replace all
+ *                          the occurences from "blue" by "red" and from
+ *                          "yellow" by "orange"
  */
 function multiple_replace(str, keywords) {
     var pattern = [];

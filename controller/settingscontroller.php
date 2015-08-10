@@ -22,11 +22,19 @@ use OCA\AgreeDisclaimer\Config\Config;
  */
 class SettingsController extends Controller {
 
+    /** @var IL10N    Translation service */
     private $l10n;
+
+    /** @var Config    Configuration settings */
     private $config;
 
     /**
      * Creates an instance to the SettingsController 
+     *
+     * @param string   $AppName    Application's name
+     * @param IRequest $request    Application's request
+     * @param IL10N    $l10n       Translation service
+     * @param Config   $config     Configuration settings
      */
     public function __construct($AppName, IRequest $request, IL10N $l10n,
                         Config $config) {
@@ -52,33 +60,12 @@ class SettingsController extends Controller {
      *          the application will be used.
      *
      * @return array   Array with the file information for the txt and pdf
-     *         files. It has this format:
+     *         files. See the Config class methods: getTxtFileData and
+     *         getPdfFileData for more info about the returned array, which has
+     *         the format
      *          [
-     *              '<appId>TxtFile'        => [
-     *                  'value'    => <true_or_false>,
-     *                  'basePath' => <absolute_path_of_txt_file>,
-     *                  'file'     => [
-     *                      'exists'  => <does_the_file_exist>,
-     *                      'lang'    => <file_language_code>,
-     *                      'name'    => <file_name>,
-     *                      'path'    => <file_location_in_the_file_system>,
-     *                      'url'     => <url_to_file_in_web_browser>,
-     *                      'content' => <contents_txt_file>,
-     *                      'error'   => <error_message>,
-     *                  ],
-     *              ],
-     *              '<appId>PdfFile'        => [
-     *                  'value'    => <true_or_false>,
-     *                  'basePath' => <absolute_path_of_pdf_file>,
-     *                  'file'     => [
-     *                      'exists'  => <does_the_file_exist>,
-     *                      'lang'    => <file_language_code>,
-     *                      'name'    => <file_name>,
-     *                      'path'    => <file_location_in_the_file_system>,
-     *                      'url'     => <url_to_file_in_web_browser>,
-     *                      'error'   => <error_message>,
-     *                  ],
-     *              ]
+     *              'txtFileData'        => <txt_file_data>,
+     *              'pdfFileData'        => <pdf_file_data>
      *          ]
      */
     function getFiles($isAdminForm = false, $defaultLang = null) {

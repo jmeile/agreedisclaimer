@@ -12,6 +12,7 @@
  */
 $(document).ready(function(){
     'use strict';
+    /** Fix it: It would be nice to adquire it from somewhere */
     var appName = 'agreedisclaimer'; 
 
     //Application settings
@@ -102,6 +103,8 @@ $(document).ready(function(){
     /**
      * Reloads the txt file contents and the pdf link according to the entered
      * language by calling the settings#get_files route through an ajax request
+     *
+     * @param string currentLang    The current language
      */
     function reloadFileInfo(currentLang)
     {

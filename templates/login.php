@@ -28,7 +28,7 @@ script($_['appName'], 'login');
 style($_['appName'], 'login');
 ?>
 
-<!-- Every html code after this gets ignored :-(
+<!-- Fix it: Every html code after this gets ignored :-(
      That's why I have to code everything on javascript. I asked already about
      this on the developers maillist, but I didn't get any answer:
      * Returning Template for login page

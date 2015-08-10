@@ -12,6 +12,7 @@
  */
 $(document).ready(function(){
     'use strict';
+    /** Fix it: it would be nice to adquire it from somewhere else */
     var appName = 'agreedisclaimer';
 
     //Application settings

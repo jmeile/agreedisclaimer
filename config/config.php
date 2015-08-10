@@ -15,6 +15,8 @@ use OCP\IURLGenerator;
 
 use OCP\IL10N;
 
+use \OCP\ILogger;
+
 use OCA\AgreeDisclaimer\AppInfo\Application;
 
 /**
@@ -30,7 +32,13 @@ class Config {
     /** @var IL10N    Translation service */
     private $l10n;
 
+    /** 
+     * @var IURLGenerator    Class used to generate urls to internal resources 
+     */
     private $urlGenerator;
+
+    /** Logger service */
+    private $logger;
 
     /**
      * Creates a Config object an registers the admin page for the app
@@ -41,11 +49,13 @@ class Config {
      * @param IURLGenerator $urlGenerator   OwnCloud's url generator
      */
     public function __construct(Application $app, IAppConfig $appConfig,
-                        IL10N $l10n, IURLGenerator $urlGenerator) {
+                        IL10N $l10n, IURLGenerator $urlGenerator,
+                        ILogger $logger) {
         $this->app = $app;
         $this->appConfig = $appConfig; 
         $this->l10n = $l10n;
         $this->urlGenerator = $urlGenerator;
+        $this->logger = $logger;
 
         //Registers application parameters
         $container = $this->app->getContainer();
@@ -69,6 +79,10 @@ class Config {
     /**
      * Gets the specified property from the Application configuration
      *
+     * @param string $propName    Name of the property to get
+     * @param mixed  $defValue    Default value in case that the setting hasn't
+     *                  been assigned
+     *
      * @return mixed    The value of the specified setting
      */
     private function getProp($propName, $defValue = null) {
@@ -90,6 +104,16 @@ class Config {
     }
 
     /**
+     * Logs a message to the ownCloud's log file
+     *
+     * @param string $message    Message to log
+     */
+    public function log($message) {
+        $this->logger->error($message,
+            array('app' => $this->app->getAppName()));
+    }
+
+    /**
      * Gets the defaultLang application setting
      *
      * @return string   The default language for the disclaimer
@@ -99,7 +123,7 @@ class Config {
     }
 
     /**
-     * Gets the file name of the specified user language.
+     * Gets the file name for the specified user language.
      *
      * @param bool   $fileExists          Returns either if the file exists or
      *                   not
@@ -132,10 +156,15 @@ class Config {
         }
         if (!$fileExists) {
             $userLangFile = $filePath;
-            $fileError = $this->l10n->t('%s doesn\'t exist',
+            $message = '%s doesn\'t exist';
+            $fileError = $this->l10n->t($message,
                              $newLine . $filePath . $newLine) . '. ' .
                              $this->l10n->t('Please contact the webmaster');
             $fileError = $utils->fixCarriageReturns($fileError);
+
+            //Logs only the english message
+            $message = vsprintf($message, $filePath); 
+
             $languages = array();
             if ($getFallbackLang) {
                 $languages = array_merge($languages, $langFallbacks);
@@ -150,16 +179,22 @@ class Config {
                 if ($fileExists) {
                     $fileLang = $langCode;
                     $fileError = '';
+                    $message = '';
                     break;
                 }
             }
             if (!$fileExists && count($languages) > 1) {
-                $fileError = $this->l10n->t('Neither the file:' .
-                    ' %s nor: %s exist',
+                $message = 'Neither the file: %s nor: %s exist';
+                $fileError = $this->l10n->t($message,
                     ['<br/>'. $userLangFile. '<br/><br/>',
                      '<br/>' . $filePath . '<br/><br/>']) . '. ' .
                     \OCP\Util::getL10N($this->app->getAppName())
                         ->t('Please contact the webmaster');
+                $message = vsprintf($message, [$userLangFile, $filePath]);
+            }
+
+            if (($message !== '') && !$isAdminPage) {
+                $this->log($message);
             }
         }
         return $fileName;
@@ -182,7 +217,26 @@ class Config {
      *                   default language occurs after getting the info of the
      *                   file
      *
-     * @return array    An array with the txt file information
+     * @return array    An array with the txt file information. It has the
+     *                  following format:
+     *                  [
+     *                      'value'    => <is_setting_enabled>,
+     *                      'name'     => <file_name>,
+     *                      'basePath' => <root_folder_of_file>,
+     *                      'path'     => <file_path>,
+     *                      'url'      => <file_url>,
+     *                      'lang'     => <file_language>,
+     *                      'exists'   => <does_file_exist>,
+     *                      'error'    => <error_message>,
+     *                  ]
+     *
+     *                  Additionally this keys will be also set for txt files:
+     *                  * maxAppSize:   Maximun hard coded size for txt files
+     *                  * maxAdminSize: Maximun file size setup by the admin
+     *                  * contents:     txt file contents
+     *
+     *                  For pdf this 'icon' key will contain an url to the pdf
+     *                  icon
      */
     public function getFileData($fileExt, $getFallbackLang = true,
                         $isAdminPage = false, $defaultLang = null) {
@@ -260,14 +314,21 @@ class Config {
         if ($fileContents === false) {
             //You have to use === otherwise the empty string will be
             //evaluated to false
-            $fileError = $this->l10n->t('Could not read contents ' .
-                            'from file: %s', $filePath) . $newLine . $newLine .
+            $message = 'Could not read contents from file: %s';
+            $fileError = $this->l10n->t($message,$filePath) .
+                             $newLine . $newLine .
                          $this->l10n->t('Make sure that the file ' .
                             'exists and that it is readable by the '.
                             'apache user');
             //This ensures that carriage returns appear in a textarea
             $utils = $this->app->getUtils();
             $fileError = $utils->fixCarriageReturns($fileError);
+            
+            if (!$isAdminPage) {
+                //Logs the english message
+                $message = vsprintf($message, $filePath);
+                $this->log($message);
+            }
             $fileContents = '';
         }
         return $fileContents;

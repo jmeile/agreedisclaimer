@@ -24,6 +24,9 @@ https://apps.owncloud.com/messages/?action=newmessage&username=jmeile&PHPSESSID=
 
 Or send me an email to: jmeile at hotmail dot com
 
+For reporting issues, please use the tracker:
+https://github.com/jmeile/agreedisclaimer/issues
+
 TODO:
 * Fix the style sheets so that the pdf icon gets vertical aligned.
 * Allow to upload text and pdf files through the admin settings

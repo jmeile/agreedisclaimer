@@ -27,6 +27,7 @@ class Application extends App {
     /** @var string    Applications name */
     private $appName;
 
+    /** @var IL10N    Translation service */
     private $l10n;
 
     /** @var Config    Configuration settings */
@@ -36,8 +37,7 @@ class Application extends App {
     private $utils;
 
     /**
-     * Creates an Application object and registers its related services,
-     * user hooks, and settings
+     * Creates an Application object
      */
     public function __construct(array $urlParams=array()) {
         //This won't work on symlinks; it will return the name of the linked
@@ -45,15 +45,18 @@ class Application extends App {
         //name
         //$this->appName = basename(dirname(__DIR__));
         $this->appName = 'agreedisclaimer';
+
         parent::__construct($this->appName, $urlParams);
         $container = $this->getContainer();
         $server = $container->getServer();
         $this->l10n = $server->getL10N($this->appName);
+
         $this->config = New Config(
-                                $this, 
+                                $this,
                                 $server->getAppConfig(),
                                 $this->l10n,
-                                $server->getURLGenerator()
+                                $server->getURLGenerator(),
+                                $server->getLogger()
                         );
         $this->utils = New Utils($this, $this->l10n);
     }
@@ -186,6 +189,7 @@ class Application extends App {
 
     /**
      * Gets the configuration of this application
+     *
      * @return Config   The configuration object
      */
     public function getConfig() {
@@ -194,6 +198,7 @@ class Application extends App {
 
     /**
      * Gets the utility helpers
+     *
      * @return Utils    The utility helpers
      */
     public function getUtils() {
