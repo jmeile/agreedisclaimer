@@ -48,15 +48,27 @@ class UserHooks {
      */
     public function register($appName) {
         $callback = function($user, $password) {
-            //Fix it: How can we get the appName from here?
-            $appName = 'agreedisclaimer';
+            $app = new Application();
+            $appName = $app->getAppName(); 
+            $config = $app->getConfig();
 
             if(!isset($_POST[$appName. 'Checkbox'])) {
                 //If the "agree" checkbox wasn't checked, then an throw an
                 //exception
+                if ($config->getUseCookie()) {
+                    //In case that the agree disclaimer cookies was set, expires
+                    //it. This means that the user either unchecked the
+                    //disclaimer or he hasn't checked it yet
+                    $config->expireCheckedCookie();
+                }
                 $message = $this->l10n->t('Please read and ' .
                     'agree the disclaimer before proceeding');
                 throw new LoginException($message);
+            } else {
+                if ($config->getUseCookie()) {
+                    $config->setLastVisitCookie();
+                    $config->setCheckedCookie();
+                }
             }
         };
         $this->userManager->listen('\OC\User', 'preLogin', $callback);

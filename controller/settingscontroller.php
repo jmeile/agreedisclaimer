@@ -45,30 +45,32 @@ class SettingsController extends Controller {
 
     /**
      * @PublicPage
-     * Get the file information for the txt and pdf files
+     * Get the file information for the txt and pdf files and the cookie
+     * settings
      *
-     * @param   bool    $isAdminForm    Whether or not is called from the admin
+     * @param   bool $isAdminForm      Whether or not is called from the admin
      *          form. This is used because the method can be also called from
      *          the login page. Here the differences:
      *          - When called from the admin form, no fall back languages will
      *            be used 
      *          - When called from the login form, fall back languages will be
      *            used 
-     * @param   string  $defaultLang    Default language for which the file will
+     * @param   string $defaultLang    Default language for which the file will
      *          be recovered in case that it doesn't exist for the current
      *          language. In case that it is null, then the default language of
      *          the application will be used.
      *
      * @return array   Array with the file information for the txt and pdf
-     *         files. See the Config class methods: getTxtFileData and
-     *         getPdfFileData for more info about the returned array, which has
-     *         the format
+     *         files. See the Config class methods: getTxtFileData,
+     *         getPdfFileData, and getCookieData  for more info about the
+     *         returned array, which has the format
      *          [
      *              'txtFileData'        => <txt_file_data>,
-     *              'pdfFileData'        => <pdf_file_data>
+     *              'pdfFileData'        => <pdf_file_data>,
+     *              'cookieDate'         => <cookie_data>
      *          ]
      */
-    function getFiles($isAdminForm = false, $defaultLang = null) {
+    function getSettings($isAdminForm = false, $defaultLang = null) {
         $data = [];
         if ($defaultLang === null) {
             $defaultLang = $this->config->getDefaultLang();
@@ -85,6 +87,7 @@ class SettingsController extends Controller {
                                    $isAdminForm, $defaultLang);
         $data['pdfFileData'] = $this->config->getPdfFileData($getFallbackLang, 
                                    $isAdminForm, $defaultLang);
+        $data['cookieData'] = $this->config->getCookieData($isAdminForm);
         return $data;
     }
 }

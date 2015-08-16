@@ -34,14 +34,16 @@ $l10n = $app->getContainer()->getServer()->getL10N($appName);
 $userLang = $l10n->getLanguageCode();
 
 $data = [
-    'appName'            => $appName,
-    'filePreffix'        => $container->query('filePreffix'),
-    'txtFileData'        => $config->getTxtFileData(false, true),
-    'pdfFileData'        => $config->getPdfFileData(false, true),
-    'userLang'           => $userLang,
-    'currentLang'        => $localeInfo['activelanguage'],
-    'commonLanguages'    => $localeInfo['commonlanguages'],
-    'availableLanguages' => $localeInfo['languages'],
+    'appName'             => $appName,
+    'filePreffix'         => $container->query('filePreffix'),
+    'datepickerAppFormat' => $config->getDatepickerDateFormat(),
+    'cookieData'          => $config->getCookieData(true),
+    'txtFileData'         => $config->getTxtFileData(false, true),
+    'pdfFileData'         => $config->getPdfFileData(false, true),
+    'userLang'            => $userLang,
+    'currentLang'         => $localeInfo['activelanguage'],
+    'commonLanguages'     => $localeInfo['commonlanguages'],
+    'availableLanguages'  => $localeInfo['languages'],
 ];
 $templateResponse = new TemplateResponse($appName, 'admin', $data,
                             'blank');

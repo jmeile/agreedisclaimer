@@ -140,8 +140,7 @@ class Application extends App {
     /**
      * Renders the template for the login page
      *
-     * @return OCP\AppFramework\Http\TemplateResponse   The response for the
-     *         login template
+     * @return TemplateResponse   The response for the login template
      */
     public function getDisclaimerForm() {
         $container = $this->getContainer();

@@ -1,5 +1,97 @@
-#AgreeDisclaimer (0.0.1) - 06.08.2015
-* First release
+#AgreeDisclaimer (0.1.1) - 16.08.2015
+
+##CHANGES
+* Added feature to the admin page to allow remembering the last choice of the
+  user regarding the disclaimer checkbox. This solution was a feature request:
+  https://github.com/jmeile/agreedisclaimer/issues/3
+
+  and it was solved through two cookies: AGChecked (true if the user accepted
+  the disclaimer on a previous visit) and AGLastVisit (date of the last visit
+  from the user). The last cookie is needed because I also intruduced the
+  capability of automatically expire old set cookies. This is useful if the
+  disclaimer terms are changed.
+
+  In order to manipulate cookies, the methods: getCookie, setCookie, and
+  expireCookie were added. I know there are methods in ownCloud to do this, but
+  I did not get them working. I even read the Developer manual, but there it is
+  not clear how to set the 'Response' object. I tried several options, but I
+  finished doing it with the php functions.
+
+  The respective methods to manipulate these cookies were added:
+  getCheckedCookie, setCheckedCookie, expireCheckedCookie, getLastVisitCookie,
+  setLastVisitCookie, and expireLastVisitCookie.
+
+  As a consequence, two new four new App settings were added:
+
+  * useCookie: Indicates whether or not use cookies for remembering the checked
+    status of the disclaimer.
+
+  * cookieExpTimeIntv: Cookie expiration interval for new cookies. It can be:
+    'days', 'weeks', 'months', or 'years'. If left empty, then the cookies will
+    not expire.
+
+  * cookieExpTime: Number of cookieExpTimeIntv when the cookies will be expired,
+    ie: if cookieExpTimeIntv is 'days' and this is set to 8, cookies will expire
+    in eight days.
+
+  * forcedExpDate: Date on which the already set cookies will expire. ie: if the
+    user visits the website and agrees the disclaimer the 8th of August, 2015,
+    then the 'AGChecked' cookie will be set to true and its expiration time to:
+    cookieExpTime + cookieExpTimeIntv. Suppose that the administrator sets now
+    this date to 30th of August because the disclaimer terms changed. Now, if
+    the user visits the website the 1st of September, then its cookie will be
+    invalidated and he will have to agree again to the disclaimer.
+
+  The respective methods: getUseCookie, getCookieExpTime, getCookieExpTimeIntv,
+  and getForcedExpDate.
+
+  The getCookieData method of the Config class will be used by the get_settings
+  route to get the cookie settigns.
+
+* The feature request: https://github.com/jmeile/agreedisclaimer/issues/4
+  was solved by using the 'AGChecked' cookie on the UserHooks class.
+
+* Three new container parameters were added:
+  
+  * datepickerDateFormat: this is the jquery datepicker format for storing
+    dates. It is set to: 'mm/dd/yy'.
+  
+  * phpDateFormat: this is the php date format used for storing dates and it is
+    set to: 'm/d/Y'.
+  
+  * phpTimeFormat: date and time format used for storing date. It is set to:
+    'm/d/Y H:i'.
+
+  As a result, the methods: getDatepickerDateFormat, getPhpDateFormat, and
+  getPhpTimeFormat were added to the Config class.
+
+  The convertDateFormatToPhp method was also added to convert datepicker dates
+  format to php, ie: 'mm/dd/yy' will be converted to 'm/d/Y'.
+
+  For converting dates on php, the method convertDate was added to the config
+  class, ie: the date '08/16/2015', format: 'm/d/Y', will be converted to:
+  '16.08.2015', format: 'd.m.Y'. Similarly, a convertDate function was added to
+  the utils.js to convert dates in javascript; here the datepicker format will
+  be used.
+
+  Please do not change this formats since it will break the application. If you
+  want to use a different format for displaying dates, then add the respective
+  translation to the string: 'mm/dd/yy' on the l10n file. Here you need to use
+  datepicker format and not php.
+
+* Unfortunatelly, ownCloud core lib do not include the datepicker locales, so, I
+  had to inject them manually through the datepicker_l10n.js file, which uses
+  l10n to translate the strings. It would be easier to use:
+  $.datepicker.regional[userLang], but the jquery library from ownCloud do not
+  include them :-(
+
+* Renamed the router: settings#get_files to settings#get_settings. Now not only
+  the file information from the disclaimer will be returned, but also the cookie
+  data. As a consequence, the method getFiles from the SettingsController class
+  was renamed to: getSettings
+
+* A setProp method was added to the Config class to set the application
+  settings.
 
 #AgreeDisclaimer (0.1.0) - 10.08.2015
 
@@ -92,3 +184,6 @@
   be used. To achive this, the **DIRECTORY_SEPARATOR** php global was used.
 
 * The **get_settings** route was removed. only the **get_files** route was kept.
+
+#AgreeDisclaimer (0.0.1) - 06.08.2015
+* First release

@@ -11,6 +11,12 @@
     "Agree disclaimer":
     "Exclusión de responsabilidad",
 
+    "Automatically expire cookies older than":
+    "Expirar automáticamente cookies anteriores a",
+
+    "By activating this setting two cookies will be set":
+    "Al activar esta opción, dos cookies serán almacenadas",
+
     "Contents of the file":
     "Contenido del archivo",
 
@@ -23,6 +29,12 @@
     "Current PDF":
     "PDF actual",
 
+    "Date and time of the last user's visit":
+    "Fecha y hora de la última visita del usuario", 
+
+    "Days":
+    "Días",
+
     "Decline":
     "Declinar",
 
@@ -31,6 +43,12 @@
 
     "Disclaimer of liability":
     "Exclusión de responsabilidad",
+
+    "Expiration interval for new cookies":
+    "Intervalo de expiración para cookies nuevas",
+    
+    "Done":
+    "Cerrar",
 
     "File not found":
     "Archivo no encontrado",
@@ -47,6 +65,9 @@
     "If the text file is bigger than this size, then its contents won't appear completely in the dialog, so, adjust the size till it is adequate to your needs":
     "Si el archivo de texto es más grande que este tamaño, sus contenidos no serán mostrados completamente en el diálogo; ajúste este valor hasta que sea adecuado a sus necesidades",
 
+    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "Si es verdadero, indica que el usuario ya ha visitado el sitio y ha aceptado la exclusión de responsabilidad",
+
     "If you want to modify this limit, do it at your own risk by changing the value of the parameter: maxAppTxtFileSize inside the config.php file":
     "Si usted quiere modificar este límite, hágalo bajo su propia responsabilidad cambiando el valor del parámetro: maxAppTxtFileSize dentro del archivo config.php",
 
@@ -62,8 +83,20 @@
     "Maximum file size in megabytes for the text file":
     "Tamaño máximo del archivo de texto en megabytes",
 
+    "mm/dd/yy":
+    "dd/mm/yy",
+
+    "Months":
+    "Meses",
+
     "Neither the file: %s nor: %s exist":
     "Ni el achivo: %s o: %s existen",
+
+    "Next":
+    "Sig",
+
+    "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
+    "Por el contrario, si el usuario ya ha visitado el sitio, ha aceptado la exclusión de responsabilidad y hay una fecha de expiración para cookies anteriores, la antigüedad de AGChecked será calculada obteniendo AGLastVisit; si ésta es mayor que dicha fecha de expiración, ésta será invalidada",
 
     "Please read and agree the disclaimer before proceeding":
     "Por favor lea y acepte la exclusión de responsabilidad antes de proceder",
@@ -74,6 +107,9 @@
     "Please contact the webmaster":
     "Por favor contacte el administrador de la página web",
 
+    "Prev":
+    "Ant",
+
     "Show a link to a PDF file with the disclaimer":
     "Mostrar un enlace a un archivo PDF",
 
@@ -83,17 +119,37 @@
     "Show/Hide help":
     "Mostrar/Ocultar ayuda",
 
+    "The value of the AGChecked will be set the first time that the user visits the website or when it has been expired":
+    "El valor de AGChecked será asignado la primera vez que el usuario visita el sitio o cuando ésta haya expirado",
+
     "This must be set in order to prevent the download of big text files, which may block the login page":
     "Este valor debe ser ingresado para prevenir que la carga archivos de texto grandes bloqueen la página de registro",
+
+    "Today":
+    "Hoy",
 
     "To enable more languages, put your text files here":
     "Para activar más idiomas, ubique sus archivos aquí",
 
+    "Use a cookie for remembering the user's choice":
+    "Usar una cookie para recordar la elección del usuario",
+
+    "Weeks":
+    "Semanas",
+
     "Where":
     "Donde",
 
+    "Wk":
+    "Sm",
+
+    "Won't expire":
+    "No expira",
+
+    "Years":
+    "Años",
+
     "You must check at least one option!":
     "Debe seleccionar al menos una opción"
-
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

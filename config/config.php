@@ -11,6 +11,8 @@ namespace OCA\AgreeDisclaimer\Config;
 use OCP\App;
 use OCP\IAppConfig;
 
+use OCP\AppFramework\Http\Response;
+
 use OCP\IURLGenerator;
 
 use OCP\IL10N;
@@ -67,6 +69,13 @@ class Config {
         $container->registerParameter('pdfBasePath',
                                       $this->buildPath([$appPath, 'pdf']));
         $container->registerParameter('maxAppTxtFileSize', 3);
+
+        //Please do not change this format. It will be used to store dates
+        //an times. For visualization, modify the translation of the string:
+        //'mm/dd/yy' on the respective l10n file
+        $container->registerParameter('phpDateFormat', 'm/d/Y');
+        $container->registerParameter('datepickerDateFormat', 'mm/dd/yy');
+        $container->registerParameter('phpTimeFormat', 'H:i');
     }
 
     /**
@@ -83,11 +92,62 @@ class Config {
      * @param mixed  $defValue    Default value in case that the setting hasn't
      *                  been assigned
      *
-     * @return mixed    The value of the specified setting
+     * @return string    The value of the specified setting
      */
     private function getProp($propName, $defValue = null) {
         return $this->appConfig->getValue($this->app->getAppName(), $propName,
                                      $defValue);
+    }
+
+    /**
+     * Sets the specified property from the Application configuration
+     *
+     * @param string $propName     Name of the property to modify 
+     * @param mixed  $propValue    Value to set
+     */
+    private function setProp($propName, $propValue) {
+        $this->appConfig->setValue($this->app->getAppName(), $propName,
+                                   $propValue);
+    }
+
+    /**
+     * Gets the php time format used by the app
+     *
+     * @return string   The time format used by the app
+     */
+    public function getPhpTimeFormat() {
+        $container = $this->app->getContainer();
+        return $container->query('phpTimeFormat');
+    }
+
+    /**
+     * Gets the php date format used by the app
+     *
+     * @return string   The date format used by the app
+     */
+    public function getPhpDateFormat() {
+        $container = $this->app->getContainer();
+        return $container->query('phpDateFormat');
+    }
+
+    /**
+     * Gets the datepicker date format used by the app
+     *
+     * @return string   The date format used by the app
+     */
+    public function getDatepickerDateFormat() {
+        $container = $this->app->getContainer();
+        return $container->query('datepickerDateFormat');
+    }
+
+    /**
+     * Gets the php date and time format used by the app concanated into a
+     * string
+     *
+     * @return string   The date and time format used by the app
+     */
+    public function getPhpDateTimeFormat() {
+        return $this->getPhpDateFormat() . ' ' . $this->getPhpTimeFormat();
     }
 
     /**
@@ -120,6 +180,351 @@ class Config {
      */
     public function getDefaultLang() {
         return $this->getProp('defaultLang', 'en');
+    }
+
+    /**
+     * Gets the expiration time for cookies
+     *
+     * @param bool $saveOnNull    Whether or not to save the expiration time if
+     *                 it wasn't set before. This will be set to true only on
+     *                 the admin page; for the login page (anonymous access),
+     *                 the time won't be saved
+     *
+     * @return string    The cookie expiration time
+     */
+    public function getCookieExpTime($saveOnNull = false) {
+        $cookieExpTime = $this->getProp('cookieExpTime');
+        if ($cookieExpTime === null) {
+            $cookieExpTime = ''; 
+            if ($saveOnNull) {
+                $this->setProp('cookieExpTime', $cookieExpTime);
+            }
+            $this->log("cookieExpTime not set");
+        } else
+            $this->log("Got cookieExpTime: $cookieExpTime");
+        return $cookieExpTime;
+    }
+
+    /**
+     * Gets the expiration time interval for cookies
+     *
+     * @param bool $saveOnNull    Whether or not to save the expiration time
+     *                 interval if it wasn't set before. This will be set to
+     *                 true only on the admin page; for the login page
+     *                 (anonymous access), the time won't be saved
+     *
+     * @return string    The cookie expiration time, which can be either:
+     *                   'days', 'weeks', 'months', or 'years'
+     */
+    public function getCookieExpTimeIntv($saveOnNull = false) {
+        $cookieExpTimeIntv = $this->getProp('cookieExpTimeIntv');
+        if ($cookieExpTimeIntv === null) {
+            $cookieExpTimeIntv = '';
+            if ($saveOnNull) {
+                $this->setProp('cookieExpTimeIntv', $cookieExpTimeIntv);
+            }
+            $this->log("cookieExpTimeIntv not set");
+        } else
+            $this->log("Got cookieExpTimeIntv: $cookieExpTimeIntv");
+        return $cookieExpTimeIntv;
+    }
+
+    /**
+     * Converts the entered date format (datepicker notation) to its php
+     * representation
+     *
+     * @param string $srcFormat    The format to convert
+     *
+     * @remarks    The entered format has the datepicker notation, ie: dd/mm/yy
+     */
+    function convertDateFormatToPhp($srcFormat) {
+        return str_replace(['dd', 'mm', 'yy'], ['d', 'm', 'Y'], $srcFormat);
+    }
+
+    /**
+     * Converts the entered date to the specified dateFormat
+     *
+     * @param string $srcDateStr    The date to convert. It must match the
+     *                   entered source format
+     * @param string $srcFormat     The date format to convert from
+     * @param string $destFormat    The date format to convert to
+     *
+     *
+     * @return string    The converted date string
+     *
+     * @remarks    The entered formats follow the php notation, ie: 'd/m/Y'.
+     */
+    function convertDate($srcDateStr, $srcFormat, $destFormat) {
+        if (($srcDateStr === '') || ($srcFormat === $destFormat)) {
+            return $srcDateStr;
+        }
+        $srcDate = \DateTime::createFromFormat($srcFormat, $srcDateStr);
+        return $srcDate->format($destFormat);
+    }
+
+    /**
+     * Gets a cookie
+     *
+     * @param string    $cookieName       Name of the cookie to get
+     *
+     * @remarks: Please note that I didn't get the ownCloud methods working, so,
+     *           I'm using the php way. Before trying this, I wasn't using any
+     *           path for the cookie, but it didn't work, so, I added
+     *           '/owncloud' as path.
+     */
+    public function getCookie($cookieName) {
+        //Fix it: use the ownCloud's methods
+        //$container = $this->app->getContainer();
+        //$request = $container->query('Request');
+
+        //I was having some issues with owncloud's cookie methods, so I decided
+        //to use php syntax
+        //$cookieValue = $request->getCookie($cookieName);
+        $cookieValue = isset($_COOKIE[$cookieName]) ? $_COOKIE[$cookieName] :
+                           null;
+
+        if ($cookieValue !== null)
+            $this->log("Got cookie: $cookieName, value: $cookieValue");
+        else
+            $this->log("Cokie not found: $cookieName");
+
+        return $cookieValue;
+    }
+
+    /**
+     * Sets a cookie
+     *
+     * @param string    $cookieName       Name of the cookie to set
+     * @param \DateTime $cookieExpDate    DateTime object with the cookie
+     *                      expiration date. Please note that php uses seconds
+     *                      since the epoch, but since this is complicated, I
+     *                      decided to use DateTime and convert them to that
+     *                      format afterwards
+     *
+     * @remarks: Please note that I didn't get the ownCloud methods working, so,
+     *           I'm using the php way. Before trying this, I wasn't using any
+     *           path for the cookie, but it didn't work, so, I added
+     *           '/owncloud' as path.
+     */
+    public function setCookie($cookieName, $cookieValue, $cookieExpDate) {
+        //Fix it: use the ownCloud's methods
+        //$response = new Response();
+        setcookie($cookieName, $cookieValue, $cookieExpDate->format('U'),
+            '/owncloud'); 
+
+        $this->log("Set cookie: $cookieName to $cookieValue exp: " . $cookieExpDate->format($this->getPhpDateTimeFormat()));
+
+        //I din't get this working, so, I had to use php cookie functions
+        //$response->addCookie($cookieName, $cookieValue, $cookieExpDate);
+        //return $response;
+    }
+
+    /**
+     * Expires a cookie
+     *
+     * @param string $cookieName    Name of the cookie to expire
+     *
+     * @remarks: Please note that I didn't get the ownCloud methods working, so,
+     *           I'm using the php way. Before trying this, I wasn't using any
+     *           path for the cookie, but it didn't work, so, I added
+     *           '/owncloud' as path.
+     */
+    public function expireCookie($cookieName) {
+        //Fix it: use the ownCloud's methods
+        //I didn't got this working, so using php functions instead
+        /*
+        $response = new Response();
+        $response->invalidateCookie('AGChecked');
+        */
+        $this->log("Unsetting cookie: $cookieName");
+        unset($_COOKIE[$cookieName]);
+
+        //It seems that unsetting it isn't enough, so, we set it with a time in
+        //the past
+        $yesterday = new \DateTime('now');
+        $yesterday->sub(new \DateInterval('P10D'));
+        $this->setCookie($cookieName, 'expired', $yesterday);
+
+        //$response->invalidateCookie($cookieName);
+        //return $response;
+    }
+
+
+    /**
+     * Gets the useCookie application setting
+     *
+     * @return bool    The value of the useCookie setting 
+     */
+    public function getUseCookie() {
+        $utils = $this->app->getUtils();
+        return $utils->strToBool($this->getProp('useCookie', false));
+    }
+
+    /**
+     * Gets the last visit cookie
+     *
+     * @return string   A formated string with the date and time of the last
+     *                  visit
+     */
+    public function getLastVisitCookie() {
+        $lastVisit = $this->getCookie('AGLastVisit'); 
+                    
+        if ($lastVisit === null) {
+            $lastVisit = $this->setLastVisitCookie(); 
+        }
+        $this->log("Got AGLastVisit: $lastVisit");
+        return $lastVisit;
+    }
+
+    /**
+     * Sets the last visit cookie
+     *
+     * @return string   The value to which the last visit cookie was set
+     */
+    public function setLastVisitCookie() {
+        $today = new \DateTime('now');
+        $lastVisit = $today->format($this->getPhpDateFormat());
+        $farFuture = new \DateTime('2037-01-01');
+        $this->setCookie('AGLastVisit', $lastVisit, $farFuture);
+
+        return $lastVisit;
+    }
+
+    /**
+     * Expires the last visit cookie
+     */
+    public function expireLastVisitCookie() {
+        $this->expireCookie('AGLastVisit');
+    }
+
+    /**
+     * Gets the value of the cookie indicated whether or not that the disclaimer
+     * was accepted
+     *
+     * @return bool    The boolean value of the cookie
+     */
+    public function getCheckedCookie() {
+        $utils = $this->app->getUtils();
+
+        $forcedExpDateStr = $this->getForcedExpDate();
+        if ($forcedExpDateStr !== '') {
+            $forcedExpDate = \DateTime::createFromFormat(
+                $this->getPhpDateFormat(),
+                $forcedExpDateStr);
+            $lastVisitCookie = $this->getLastVisitCookie();
+            $lastVisitDate = \DateTime::createFromFormat(
+                $this->getPhpDateFormat(),
+                $lastVisitCookie);
+
+            $this->log($lastVisitDate->format($this->getPhpDateTimeFormat()) . ' <= ' . $forcedExpDate->format($this->getPhpDateTimeFormat()));
+            if ($lastVisitDate <= $forcedExpDate) {
+                $this->expireCheckedCookie();
+            }
+        }
+        return $utils->strToBool($this->getCookie('AGChecked'));
+    }
+
+    /**
+     * Sets the value of the cookie indicated whether or not that the disclaimer
+     * was accepted
+     */
+    public function setCheckedCookie() {
+        $cookieExpTime = $this->getCookieExpTime();
+        $cookieExpDate = new \DateTime('2037-01-01');
+        if ($cookieExpTime !== '') {
+            $cookieExpTimeIntv = $this->getCookieExpTimeIntv();
+            $cookieExpDate = new \DateTime('now');
+            $cookieExpTimeIntvChar = strtoupper(substr($cookieExpTimeIntv,0,1));
+            $cookieExpDate->add(new \DateInterval('P' . $cookieExpTime .
+                                $cookieExpTimeIntvChar));
+            $cookieExpDateStr = $cookieExpDate->format(
+                                    $this->getPhpDateTimeFormat()
+                                );
+        }
+        $this->setCookie('AGChecked', true, $cookieExpDate);
+    }
+
+    /**
+     * Expires the disclaimer cookie
+     */
+    public function expireCheckedCookie() {
+        $this->expireCookie('AGChecked');
+    }
+
+    /**
+     * Gets the forced expiration date
+     */
+    public function getForcedExpDate() {
+        $forcedExpDate = $this->getProp('forcedExpDate');
+        if ($forcedExpDate === null) {
+            $forcedExpDate = '';
+            $this->log("forcedExpDate not set");
+        } else
+            $this->log("Got forcedExpDate: $forcedExpDate");
+        return $forcedExpDate;
+    }
+
+    /**
+     * Gets all the cookie settings
+     *
+     * @param bool $isAdminPage    Whether or not is the admin page
+     *
+     * @return array    An array with all cookie settings. It has the format:
+     *                  [
+     *                      'value' => <using_cookies>,
+     *                      'forcedExpDate' => <exp_date_old_cookies>,
+     *                      'checkedCookie' => <was_disclaimer_checked>,
+     *                      'cookieExpTime' => <exp_time_new_cookies>
+     *                      'cookieExpTimeIntv' => <exp_time_intv_new_cookies>
+     *                  ]
+     *
+     *                  Please note that if 'useCookie' is false, no other value
+     *                  will be included in the array. Additionally, if the
+     *                  method is being called from the login page, then only
+     *                  the value of: 'checkedCookie' will be returned; at this
+     *                  point no other information is needed. 
+     */
+    public function getCookieData($isAdminPage = false) {
+        $data = [];
+        $data['value'] = $this->getUseCookie();
+        if ($data['value']) {
+            if (!$isAdminPage) {
+                $data['checkedCookie'] = $this->getCheckedCookie();
+                $saveOnNull = false;
+            } else {
+                $data['cookieExpTimeIntv'] = $this->getCookieExpTimeIntv(true);
+                if ($data['cookieExpTimeIntv'] === '') {
+                    $this->setProp('cookieExpTime', '');
+                }
+                $data['cookieExpTime'] = $this->getCookieExpTime(true);
+                if ($data['cookieExpTime'] === '') {
+                    $this->setProp('cookieExpTimeIntv', '');
+                    $data['cookieExpTimeIntv'] = '';
+                }
+
+                $forcedExpDateStr = $this->getForcedExpDate();
+                $forcedExpDate = '';
+                if ($forcedExpDateStr !== '') {
+                    $userDateFormat = $this->l10n->t(
+                                          $this->getDatepickerDateFormat()
+                                      );
+                    $userDateFormat = $this->convertDateFormatToPhp(
+                                          $userDateFormat
+                                      );
+
+                    $forcedExpDate = $this->convertDate(
+                                         $forcedExpDateStr,
+                                         $this->getPhpDateFormat(),
+                                         $userDateFormat
+                                     );
+                }
+                $data['forcedExpDate'] = $forcedExpDate;
+            }
+        } elseif ($isAdminPage) {
+            $data['forcedExpDate'] = '';
+            $$data['cookieExpTime'] = '';
+        }
+        return $data;
     }
 
     /**

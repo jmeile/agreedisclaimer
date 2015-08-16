@@ -10,6 +10,9 @@
     "Agree disclaimer":
     "",
 
+    "Automatically expire cookies older than":
+    "",
+
     "Could not read contents from file: %s":
     "",
 
@@ -22,6 +25,12 @@
     "Current PDF":
     "",
 
+    "Days":
+    "",
+
+    "Date and time of the last user's visit":
+    "",
+
     "Decline":
     "",
 
@@ -31,10 +40,19 @@
     "Disclaimer of liability":
     "",
 
+    "Done":
+    "",
+
+    "Expiration interval for new cookies":
+    "",
+
     "File not found":
     "",
 
     "I have read and understood the %s1disclaimer of liability%s2":
+    "",
+
+    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
     "",
 
     "It can be a two character code, ie: %s or a five character code, ie: %s":
@@ -61,7 +79,19 @@
     "Maximum file size in megabytes for the text file":
     "",
 
+    "Months":
+    "",
+
+    "mm/dd/yy":
+    "",
+
     "Neither the file: %s nor: %s exist":
+    "",
+
+    "Next":
+    "",
+
+    "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
     "",
 
     "Please read and agree the disclaimer before proceeding":
@@ -73,6 +103,9 @@
     "Please contact the webmaster":
     "",
 
+    "Prev":
+    "",
+
     "Show a link to a PDF file with the disclaimer":
     "",
 
@@ -82,13 +115,34 @@
     "Show/Hide help":
     "",
 
+    "The value of the AGChecked will be set the first time that the user visits the website or when it has been expired":
+    "",
+
     "This must be set in order to prevent the download of big text files, which may block the login page":
     "",
 
     "To enable more languages, put your text files here":
     "",
 
+    "Today":
+    "",
+
+    "Use a cookie for remembering the user's choice":
+    "",
+
+    "Weeks":
+    "",
+
     "Where":
+    "",
+
+    "Wk":
+    "",
+
+    "Won't expire":
+    "",
+
+    "Years":
     "",
 
     "You must check at least one option!":

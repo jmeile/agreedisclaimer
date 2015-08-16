@@ -25,43 +25,50 @@ $(document).ready(function(){
     var pdfPath;
     var pdfIcon;
     var errorPdf;
+    var useCookie;
+    var disclaimerAccepted = false;
 
     /**
-     * Ajax request for calling the settings#get_files route
+     * Ajax request for calling the settings#get_settings route
      */
-    var baseUrl = OC.generateUrl('/apps/' + appName + '/settings/get_files');
+    var baseUrl = OC.generateUrl('/apps/' + appName + '/settings/get_settings');
     $.ajax({
         url: baseUrl,
         type: 'GET',
         async: false,
         contentType: 'application/json; charset=utf-8',
-        success: function(files) {
-            showTxt = files['txtFileData']['value'];
-            showPdf = files['pdfFileData']['value'];
+        success: function(settings) {
+            showTxt = settings['txtFileData']['value'];
+            showPdf = settings['pdfFileData']['value'];
+            useCookie = settings['cookieData']['value']; 
 
             if (showTxt) {
-                if (files['txtFileData']['error'] === '') {
+                if (settings['txtFileData']['error'] === '') {
                     //If there weren't any error, the file contents will be
                     //shown
-                    txtContents = files['txtFileData']['contents'];
+                    txtContents = settings['txtFileData']['contents'];
                 } else {
                     //Otherwise an error will be displayed
-                    txtContents = files['txtFileData']['error'];
+                    txtContents = settings['txtFileData']['error'];
                 }
             }
 
             if (showPdf) {
-                pdfIcon = files['pdfFileData']['icon'];
+                pdfIcon = settings['pdfFileData']['icon'];
                 errorPdf = false;
-                if (files['pdfFileData']['error'] === '') {
+                if (settings['pdfFileData']['error'] === '') {
                     //If there weren't any error, a link to the pdf will be
                     //shown
-                    pdfPath = files['pdfFileData']['url'];
+                    pdfPath = settings['pdfFileData']['url'];
                 } else {
                     //Otherwise an error will be displayed
-                    pdfPath = files['pdfFileData']['error']; 
+                    pdfPath = settings['pdfFileData']['error']; 
                     errorPdf = true;
                 }
+            }
+
+            if (useCookie) {
+                disclaimerAccepted = settings['cookieData']['checkedCookie'];
             }
         }
     });
@@ -120,7 +127,11 @@ $(document).ready(function(){
         var disclaimerHtml = '<div class="' + appName + '">\n' +
                              '    <input id="' + appName + 'Checkbox" ' +
                                         'name="' + appName + 'Checkbox" ' +
-                                        'type="checkbox"/>\n' +
+                                        'type="checkbox"'
+        if (disclaimerAccepted) {
+            disclaimerHtml = disclaimerHtml + ' checked';
+        }
+        disclaimerHtml = disclaimerHtml + '/>\n' +
                              '    <div id="' + appName + 'Div">\n' +
                              '        ' + text + '\n' +
                              '    </div>\n' + 

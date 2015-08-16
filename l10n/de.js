@@ -13,6 +13,12 @@ OC.L10N.register(
     "Agree disclaimer":
     "Haftungsablehnung",
 
+    "Automatically expire cookies older than":
+    "Automatisches Ablaufdatum für bestehende Cookies",
+
+    "By activating this setting two cookies will be set":
+    "Wenn diese Option aktiviert ist, werden zwei Cookies gespeichert",
+
     "Contents of the file":
     "Inhalte der Datei",
 
@@ -25,6 +31,12 @@ OC.L10N.register(
     "Current PDF":
     "Aktuelle PDF",
 
+    "Date and time of the last user's visit":
+    "Datum und Zeit der letzte Besuch des Benutzers",
+
+    "Days":
+    "Tage",
+
     "Decline":
     "Ablehnen",
 
@@ -34,11 +46,20 @@ OC.L10N.register(
     "Disclaimer of liability":
     "Haftungsablehnung",
 
+    "Done":
+    "Schließen",
+
+	"Expiration interval for new cookies":
+    "Ablaufintervall für neue Cookies",
+    
     "File not found":
     "Datei nicht gefunden",
 
     "I have read and understood the %s1disclaimer of liability%s2":
     "Ich akzeptiere die %s1Ablehnung der Haftung%s2",
+
+    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "Fals wahr, es heißt der Benutzer hat die Webseite bereits besucht und die Haftungsablehnung zugestimmt",
 
     "It can be a two character code, ie: %s or a five character code, ie: %s":
     "Es kann entweder einer zwei Zeichen-Kode, z.B.: %s oder einer fünf Zeichen-Kode, z.B.: %s sein",
@@ -64,8 +85,20 @@ OC.L10N.register(
     "Maximum file size in megabytes for the text file":
     "Maximum Größe der Textdatei in Megabytes",
 
+    "mm/dd/yy":
+    "dd.mm.yy",
+
+    "Months":
+    "Monate",
+
     "Neither the file: %s nor: %s exist":
     "Weder die Datei %s noch: %s wurden gefunden",
+
+    "Next":
+    "Vor",
+
+    "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
+    "Im Gegenteil, falls den Benutzer die Webseite bereits besucht und die Haftungsablehnung zugestimmt hat, dann wird das Alter des Cookies durch den Wert von AGLastVisit gerechnet. Falls es höher als das Ablaufdatum der bisherigen Cookies, dann wird es gelöscht",
 
     "Please read and agree the disclaimer before proceeding":
     "Bitte Haftungsablehnung vor der Anmeldung lesen und zustimmen",
@@ -76,6 +109,9 @@ OC.L10N.register(
     "Please contact the webmaster":
     "Bitte kontaktiere den Website-Administrator",
 
+    "Prev":
+    "Zurück",
+
     "Show a link to a PDF file with the disclaimer":
     "Link zur PDF-Datei anzeigen",
 
@@ -85,14 +121,35 @@ OC.L10N.register(
     "Show/Hide help":
     "Hilfe anzeigen/ausblenden",
 
+    "The value of the AGChecked will be set the first time that the user visits the website or when it has been expired":
+    "Der Wert von AGChecked werde beim ersten Besuch des Benutzer oder wenn ihn abgealufen ist",
+
     "This must be set in order to prevent the download of big text files, which may block the login page":
     "Diesen Wert musst gesetzt werden um zu verhindern, dass das Hochladen von größere Text-Dateien die Anmeldung-Seite blockieren",
+
+    "Today":
+    "Heute",
 
     "To enable more languages, put your text files here":
     "Um mehrere Sprachen zu aktivieren, bitte deine Dateien hier speichern",
 
+    "Use a cookie for remembering the user's choice":
+    "Ein Cookie nutzen um die Auswahl des Benutzers zu merken",
+
+    "Weeks":
+    "Wochen",
+
     "Where":
     "Wo",
+
+    "Wk":
+    "KW",
+
+    "Won't expire":
+    "Kein Ablaufdatum",
+
+    "Years":
+    "Jahre",
 
     "You must check at least one option!":
     "Du musst mindestens eine Option wählen"

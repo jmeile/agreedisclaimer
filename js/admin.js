@@ -10,54 +10,179 @@
 /**
  * Script to setup the html elements of the admin template
  */
-$(document).ready(function(){
+$(document).ready(function() {
     'use strict';
     /** Fix it: It would be nice to adquire it from somewhere */
-    var appName = 'agreedisclaimer'; 
+    var appName = 'agreedisclaimer';
 
     //Application settings
-    var pdfFileProp = appName + 'PdfFile';
+    var pdfFileProp = appName + 'pdfFile';
     var pdfFileUrlProp = pdfFileProp + 'Url';
-    var txtFileProp = appName + 'TxtFile';
+    var txtFileProp = appName + 'txtFile';
     var txtFileContentsProp = txtFileProp + 'Contents';
     var txtFilePathProp = txtFileProp + 'Path';
-    var maxAdminTxtSizeProp = appName + 'MaxAdminTxtSize';
+    var maxAdminTxtSizeProp = appName + 'maxAdminTxtSize';
     var maxAppTxtSize = parseInt(
-                            $('#' + appName + 'MaxAppTxtSize').val()
+                            $('#' + appName + 'maxAppTxtSize').val()
                         );
-    var defaultLangProp = appName + 'DefaultLang';
+    var defaultLangProp = appName + 'defaultLang';
+    var useCookieProp = appName + 'useCookie';
+    var cookieExpTimeProp = appName + 'cookieExpTime';
+    var cookieExpTimeIntvProp = cookieExpTimeProp + 'Intv';
+    var forcedExpDateProp = appName + 'forcedExpDate';
+
+    var userLang = OC.getLocale().substr(0,2);
+    initDatePickerLocale(appName, userLang);
+
+    var datepickerUserFormat = $.datepicker.regional[userLang]['dateFormat'];
+    var datepickerAppFormat = $('#' + appName + 'datepickerAppFormat').val();
+
+    /**
+     * Enables or disables cookie input elements according to the status of the
+     * checkbox: useCookieProp
+     */
+    function enableDisableCookieInputs() {
+        var useCookie = $('#' + useCookieProp).attr('checked') ? true : false;
+        if (useCookie) {
+            $('#' + cookieExpTimeIntvProp).removeAttr('disabled');
+            $('#' + forcedExpDateProp).removeAttr('disabled');
+        } else {
+            $('#' + cookieExpTimeProp).attr('disabled', true);
+            $('#' + cookieExpTimeIntvProp).attr('disabled', true);
+            $('#' + forcedExpDateProp).attr('disabled', true);
+
+            //Resets previous values
+            OC.AppConfig.setValue(appName, 'cookieExpTime', '');
+            $('#' + cookieExpTimeProp).val('');
+            OC.AppConfig.setValue(appName, 'cookieExpTimeIntv', '');
+            $('#' + cookieExpTimeIntvProp).val('');
+            OC.AppConfig.setValue(appName, 'forcedExpDate', '');
+            $('#' + forcedExpDateProp).val('');
+        }
+    }
 
     /**
      * Catches the 'change' event when changing the status of the
-     * <appName>TxtFile checkbox.
+     * <appName>useCookie checkbox.
      *
-     * @remarks: Note that if this setting is unchecked and the <appName>PdfFile
-     *           setting is also unchecked, an error dialog will be shown and
-     *           the checkbox will be checked again. This is needed to
-     *           warranted that at least one option is shown on the login page:
-     *           either a link to the txt file contents, a link to a pdf file,
-     *           or both.
+     * @remarks: Note that if this setting is unchecked, the controls:
+     *           <appName>cookieExpTime, <appName>cookieExpTimeIntv and
+     *           <appName>forcedExpDate will be disabled; otherwise they will be
+     *           enabled
      */
-    $('#' + txtFileProp).on('change', function(){
-        var propValue1 = $(this).attr('checked') ? true : false;
-        var propValue2 = $('#' + pdfFileProp).attr('checked') ? true :
-            false;
-        if ( !propValue1 && !propValue2) {
-            $('#' + appName + 'ErrorDialog').dialog('open');
-            propValue1 = true;
-            $(this).attr('checked', true);
-        }
-        if (!propValue1) {
-            $('#' + maxAdminTxtSizeProp).attr('disabled', true);
-        } else {
-            $('#' + maxAdminTxtSizeProp).removeAttr('disabled');
-        }
-        OC.AppConfig.setValue(appName, 'txtFile', propValue1);
+    enableDisableCookieInputs();
+    $('#' + useCookieProp).on('change', function() {
+        enableDisableCookieInputs();
+        var propValue = $(this).attr('checked') ? true : false;
+        OC.AppConfig.setValue(appName, 'useCookie', propValue);
     });
 
     /**
-     * Enables/Disables the '<appName>MaxAdminTxtSize' text field on load
-     * acording to the value of the <appName>TxtFile setting
+     * Only allows digits for the '<appName>cookieExpTime' input
+     */
+    $('#' + cookieExpTimeProp).keydown(onlyDigits);
+
+    /**
+     * Catches the 'change' event of the '<appName>cookieExpTime' input
+     */
+    $('#' + cookieExpTimeProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'cookieExpTime', propValue);
+    });
+
+    /**
+     * Catches the 'change' event of the '<appName>cookieExpTimeIntv' select
+     */
+    $('#' + cookieExpTimeIntvProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'cookieExpTimeIntv', propValue);
+        if (propValue === '') {
+            OC.AppConfig.setValue(appName, 'cookieExpTime', '');
+            $('#' + cookieExpTimeProp).val('');
+            $('#' + cookieExpTimeProp).attr('disabled', true);
+        } else {
+            $('#' + cookieExpTimeProp).removeAttr('disabled');
+        }
+    });
+    if ($('#' + cookieExpTimeIntvProp).val() === '') {
+        $('#' + cookieExpTimeProp).attr('disabled', true);
+    }
+
+    /**
+     * Setups the specified datepicker to have:
+     * - The locale corresponding to the user's language
+     * - The month select list
+     * - The year select list
+     * - The 'today' and 'done' buttons (button panel)
+     * - The input text disabled so that the user isn't able to enter an invalid
+     *   date; only the backspace and delete keys will be active and they will
+     *   delete the whole text input
+     * - Respond to the 'change' method and save the date to the app settings
+     *
+     * @param string id          Id of the date picker to setup
+     * @param string userLang    Current user language
+     */
+    function configDatepicker(id, userLang) {
+        var propValue = $('#' + id).val();
+
+        $('#' + id).datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            onClose: function(selectedDate) {
+                var propValue = $(this).val();
+                var propName = $(this).attr('id').split(appName)[1];
+                //Do not change the date format here. It is the one using to
+                //storing dates
+                var convertedDate = convertDate(propValue,
+                        datepickerUserFormat, datepickerAppFormat);
+                OC.AppConfig.setValue(appName, propName, convertedDate);
+            }
+        });
+
+        //Changes the jquery datepicker locale
+        $('#' + id).datepicker('option',
+            $.datepicker.regional[userLang]
+        );
+
+        /** 
+          * Disables all keys on the datepicker input texts in order to prevent
+          * that the user enters an invalid key. Only the 'Backspace' and
+          * 'Delete' keys are allowed; when pressed, the whole input text will
+          * be deleted
+          */
+        $('#' + id).keydown(function (e) {
+            // Allow the Windows and MAC key, Alt
+            if ((e.metaKey === true) || (e.altKey === true) ||
+            // Allow: F1 till F12 
+                (e.keyCode >= 112 && e.keyCode <= 123)) {
+                return;
+            }
+
+            if ($.inArray(e.keyCode, [46, 8]) !== -1) {
+                var propName = $(this).attr('id').split(appName)[1];
+                $(this).val('');
+                OC.AppConfig.setValue(appName, propName, '');
+            }
+            e.preventDefault();
+            return;
+        });
+        $('#' + id).val(propValue);
+    }
+
+    configDatepicker(forcedExpDateProp, userLang);
+
+    /**
+     * Catches the 'change' event when changing the status of the
+     * <appName>txtFile checkbox.
+     */
+    $('#' + txtFileProp).on('change', function() {
+        forceTxtOrPdf($(this), $('#' + pdfFileProp));
+    });
+
+    /**
+     * Enables/Disables the '<appName>maxAdminTxtSize' text field on load
+     * acording to the value of the <appName>txtFile setting
      */
     var isTxtFilePropChecked = $('#' + txtFileProp).attr('checked') ? true :
         false;
@@ -67,26 +192,29 @@ $(document).ready(function(){
 
     /**
      * Catches the 'change' event when changing the status of the
-     * <appName>PdfFile checkbox.
-     *
-     * @remarks: Note that if this setting is unchecked and the <appName>TxtFile
-     *           setting is also unchecked, an error dialog will be shown and
-     *           the checkbox will be checked again. This is needed to
-     *           warranted that at least one option is shown on the login page:
-     *           either a link to the txt file contents, a link to a pdf file,
-     *           or both.
+     * <appName>pdfFile checkbox.
      */
     $('#' + pdfFileProp).on('change', function(){
-        var propValue1 = $(this).attr('checked') ? true : false;
-        var propValue2 = $('#' + txtFileProp).attr('checked') ? true :
-            false;
-         if ( !propValue1 && !propValue2 ) {
-            $('#' + appName + 'ErrorDialog').dialog('open');
-            propValue1 = true;
-            $(this).attr('checked', true);
-        }
-        OC.AppConfig.setValue(appName, 'pdfFile', propValue1);
+        forceTxtOrPdf($(this), $('#' + txtFileProp));
     });
+
+    /**
+     * Forces that at least one of the entered checkboxes is set
+     *
+     * @param string control1   Control were the 'change' event was triggered
+     * @param string control2   Second control that will be validated
+     */
+    function forceTxtOrPdf(control1, control2) {
+        var propValue1 = control1.attr('checked') ? true : false;
+        var propValue2 = control2.attr('checked') ? true : false;
+        if ( !propValue1 && !propValue2 ) {
+            $('#' + appName + 'errorDialog').dialog('open');
+            propValue1 = true;
+            control1.attr('checked', true);
+        }
+        var propName = control1.attr('id').split(appName)[1];
+        OC.AppConfig.setValue(appName, propName, propValue1);
+    }
 
     /**
      * Shows the contents of the txt file and a link to the pdf for the selected
@@ -143,7 +271,7 @@ $(document).ready(function(){
     }
 
     /**
-     * Catches the 'change' event of the '<appName>MaxAdminTxtSize' input in
+     * Catches the 'change' event of the '<appName>maxAdminTxtSize' input in
      * order to warranted that it has to be lower than maxAppTxtFileSize
      */
     $('#' + maxAdminTxtSizeProp).on('change', function(){
@@ -161,14 +289,14 @@ $(document).ready(function(){
     });
 
     /**
-     * Only allows digits for the '<appName>MaxAdminFileSize' input
+     * Only allows digits for text inputs
      *
      * @remarks: This code was taken from (some modifications were done):
      * - How to allow only numeric (0-9) in HTML inputbox using jQuery?
      *   Answer by SpYk3HH
      *   http://stackoverflow.com/questions/995183/how-to-allow-only-numeric-0-9-in-html-inputbox-using-jquery
      */
-    $('#' + maxAdminTxtSizeProp).keydown(function (e) {
+    function onlyDigits(e) {
         if (
             // Allow: backspace, delete, tab, escape, enter, and scroll-lock
             ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 145]) !== -1) ||
@@ -198,7 +326,12 @@ $(document).ready(function(){
          && (e.keyCode < 96 || e.keyCode > 105)) {
             e.preventDefault();
         }
-    });
+    }
+
+    /**
+     * Only allows digits for the '<appName>maxAdminFileSize' input
+     */
+    $('#' + maxAdminTxtSizeProp).keydown(onlyDigits);
 
     //Hides the help texts during load
     $('.' + appName + '_help_content').hide();
@@ -213,7 +346,7 @@ $(document).ready(function(){
     /**
      * Dialog for showing errors
      */
-    $('#' + appName + 'ErrorDialog').dialog({
+    $('#' + appName + 'errorDialog').dialog({
         autoOpen: false,
         resizable: false,
         modal: true,

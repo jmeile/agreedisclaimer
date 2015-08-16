@@ -13,23 +13,38 @@
 */
 use OCA\AgreeDisclaimer\AppInfo\Application;
 
-$maxAppTxtSizeProp = $_['appName'] . 'MaxAppTxtSize';
-$maxAdminTxtSizeProp = $_['appName'] . 'MaxAdminTxtSize';
-$defaultLangProp = $_['appName'] . 'DefaultLang';
-$txtFileProp = $_['appName'] . 'TxtFile';
+$maxAppTxtSizeProp = $_['appName'] . 'maxAppTxtSize';
+$maxAdminTxtSizeProp = $_['appName'] . 'maxAdminTxtSize';
+$defaultLangProp = $_['appName'] . 'defaultLang';
+$txtFileProp = $_['appName'] . 'txtFile';
 $txtFilePathProp = $txtFileProp . 'Path';
 $txtFileContentsProp = $txtFileProp . 'Contents';
-$pdfFileProp = $_['appName'] . 'PdfFile';
+$pdfFileProp = $_['appName'] . 'pdfFile';
 $pdfFileUrlProp = $pdfFileProp . 'Url';
+$useCookieProp = $_['appName'] . 'useCookie';
+$cookieExpTimeProp = $_['appName'] . 'cookieExpTime';
+$cookieExpTimeIntvProp = $cookieExpTimeProp . 'Intv';
+$forcedExpDateProp = $_['appName'] . 'forcedExpDate';
+$datepickerAppFormatProp = $_['appName'] . 'datepickerAppFormat';
 
 /**
-* Adds the admin.js file to the settings page
-*/
+ * Adds the utils.js file to the settings page
+ */
+script($_['appName'], 'utils');
+
+/**
+ * Adds the admin.js file to the settings page
+ */
 script($_['appName'], 'admin');
 
 /**
-* Adds the style sheets file to the settings page
-*/
+ * Adds the jquery datepicker locales
+ */
+script($_['appName'], 'datepicker_l10n');
+
+/**
+ * Adds the style sheets file to the settings page
+ */
 style($_['appName'], 'admin');
 
 ?>
@@ -38,6 +53,8 @@ style($_['appName'], 'admin');
 <h2><?php p($l->t('Agree disclaimer')); ?></h2>
 <input id="<?php p($maxAppTxtSizeProp); ?>" type="hidden"
        value="<?php p($_['txtFileData']['maxAppSize']); ?>"/>
+<input id="<?php p($datepickerAppFormatProp); ?>" type="hidden"
+       value="<?php p($_['datepickerAppFormat']); ?>"/>
 <label for="<?php p($defaultLangProp); ?>">
     <?php p($l->t('Default language for the text')); ?>
 </label>&nbsp;
@@ -154,8 +171,81 @@ style($_['appName'], 'admin');
             }
         ?>
     </span>
+    <br/><br/>
+    <input type="checkbox" id="<?php p($useCookieProp); ?>"
+           name="<?php p($useCookieProp); ?>"
+           <?php if ($_['cookieData']['value']) p('checked'); ?>/>
+    <label for="<?php p($useCookieProp); ?>">
+        <?php p($l->t('Use a cookie for remembering the user\'s choice')); ?>
+    </label>
+    <a id="<?php p($useCookieProp . 'Help'); ?>"
+       class="<?php p($_['appName'] . '_help_button'); ?> icon-info svg"
+       title="<?php p($l->t('Show/Hide help')); ?>"></a>
+    <br/>
+    <label for="<?php p($cookieExpTimeProp); ?>">
+        <?php p($l->t('Expiration interval for new cookies')); ?>:&nbsp;
+    </label>
+    <input type="text" id="<?php p($cookieExpTimeProp); ?>"
+           name="<?php p($cookieExpTimerop); ?>"
+           value="<?php p($_['cookieData']['cookieExpTime']); ?>"/>
+    <select id="<?php p($cookieExpTimeIntvProp); ?>"
+            name="<?php p($cookieExpTimeIntvProp); ?>">
+        <option value="" 
+                <?php 
+                    if ($_['cookieData']['cookieExpTimeIntv'] === '') {
+                        p('selected');
+                }?>>
+            <?php p($l->t('Won\'t expire')); ?>
+        </option>
+        <?php foreach (['Days', 'Weeks', 'Months', 'Years'] as $intv): ?>
+            <option value="<?php p(strtolower($intv)) ?>" 
+                    <?php 
+                        if ($_['cookieData']['cookieExpTimeIntv'] ===
+                            strtolower($intv)) {
+                            p('selected');
+                        }?>>
+                 <?php p($l->t($intv)); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <br/>
+    <label for="<?php p($forcedExpDateProp); ?>">
+        <?php p($l->t('Automatically expire cookies older than')); ?>:&nbsp;
+    </label>
+    <input type="text" id="<?php p($forcedExpDateProp); ?>"
+           name="<?php p($forcedExpDateProp); ?>"
+           value="<?php p($_['cookieData']['forcedExpDate']); ?>"/>
+    <br/>
+    <div class="<?php p($_['appName'] . '_help_content'); ?>"
+         id="<?php p($useCookieProp . 'HelpContent' ) ?>">
+        <?php
+            p($l->t('By activating this setting two cookies will be set'). ':');
+        ?>
+        <ul>
+            <li>
+                <b>AGChecked:</b> 
+                <?php p($l->t('If true, it indicates that the user is a ' .
+                        'returning visitor, who already accepted the ' .
+                        'disclaimer')); ?>.
+            </li>
+            <li>
+                <b>AGLastVisit:</b>
+                <?php p($l->t('Date and time of the last user\'s visit')); ?>.
+            </li>
+        </ul><br/>
+        <?php p($l->t('The value of the AGChecked will be set the first time ' .
+                      'that the user visits the website or when it has been ' .
+                      'expired')); ?>.<br/><br/>
+        <?php p($l->t('On the contrary, if it is a returning user, who ' .
+                      'already accepted the disclaimer and there is an '.
+                      'expiration time for old cookies, then the age of the ' .
+                      'AGChecked cookie will be determined by getting the ' .
+                      'AGLastVisit cookie; if it is higher than the '.
+                      'expiration date for old cookies, then it will be ' .
+                      'invalidated')); ?>.
+    </div>
 </div>
-<div id="<?php p($_['appName']); ?>ErrorDialog"
+<div id="<?php p($_['appName']); ?>errorDialog"
      title="<?php p($l->t('Agree disclaimer')); ?> App">
     <p>
         <?php p($l->t('You must check at least one option!')); ?>
