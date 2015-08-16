@@ -129,6 +129,8 @@ $(document).ready(function() {
             changeMonth: true,
             changeYear: true,
             showButtonPanel: true,
+            minDate: new Date(2015, 0, 1),
+            maxDate: new Date(), 
             onClose: function(selectedDate) {
                 var propValue = $(this).val();
                 var propName = $(this).attr('id').split(appName)[1];

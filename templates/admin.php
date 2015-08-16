@@ -186,7 +186,7 @@ style($_['appName'], 'admin');
         <?php p($l->t('Expiration interval for new cookies')); ?>:&nbsp;
     </label>
     <input type="text" id="<?php p($cookieExpTimeProp); ?>"
-           name="<?php p($cookieExpTimerop); ?>"
+           name="<?php p($cookieExpTimeProp); ?>"
            value="<?php p($_['cookieData']['cookieExpTime']); ?>"/>
     <select id="<?php p($cookieExpTimeIntvProp); ?>"
             name="<?php p($cookieExpTimeIntvProp); ?>">

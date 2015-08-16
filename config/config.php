@@ -522,7 +522,7 @@ class Config {
             }
         } elseif ($isAdminPage) {
             $data['forcedExpDate'] = '';
-            $$data['cookieExpTime'] = '';
+            $data['cookieExpTime'] = '';
         }
         return $data;
     }
