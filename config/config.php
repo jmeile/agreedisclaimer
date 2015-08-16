@@ -270,7 +270,7 @@ class Config {
      * @remarks: Please note that I didn't get the ownCloud methods working, so,
      *           I'm using the php way. Before trying this, I wasn't using any
      *           path for the cookie, but it didn't work, so, I added
-     *           '/owncloud' as path.
+     *           '/' as path.
      */
     public function getCookie($cookieName) {
         //Fix it: use the ownCloud's methods
@@ -304,13 +304,13 @@ class Config {
      * @remarks: Please note that I didn't get the ownCloud methods working, so,
      *           I'm using the php way. Before trying this, I wasn't using any
      *           path for the cookie, but it didn't work, so, I added
-     *           '/owncloud' as path.
+     *           '/' as path.
      */
     public function setCookie($cookieName, $cookieValue, $cookieExpDate) {
         //Fix it: use the ownCloud's methods
         //$response = new Response();
         setcookie($cookieName, $cookieValue, $cookieExpDate->format('U'),
-            '/owncloud'); 
+            '/'); 
 
         $this->log("Set cookie: $cookieName to $cookieValue exp: " . $cookieExpDate->format($this->getPhpDateTimeFormat()));
 
@@ -327,7 +327,7 @@ class Config {
      * @remarks: Please note that I didn't get the ownCloud methods working, so,
      *           I'm using the php way. Before trying this, I wasn't using any
      *           path for the cookie, but it didn't work, so, I added
-     *           '/owncloud' as path.
+     *           '/' as path.
      */
     public function expireCookie($cookieName) {
         //Fix it: use the ownCloud's methods
