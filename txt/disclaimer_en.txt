@@ -1,6 +1,6 @@
 Please note that this data service is not intended to be used as a backup
 solution. Its main purpose is to temporally share files between two or more
-users. We don't take any responsibility for data loos; the user is the
+users. We don't take any responsibility for data loss; the user is the
 responsible of keeping backups from her/his own files.<br/><br/>
 
 The application must only be used for the exchange of legal content. The user is
