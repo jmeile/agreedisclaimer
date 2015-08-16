@@ -523,6 +523,8 @@ class Config {
         } elseif ($isAdminPage) {
             $data['forcedExpDate'] = '';
             $data['cookieExpTime'] = '';
+            $data['cookieExpTimeIntv'] = ''; 
+            $data['forcedExpDate'] = ''; 
         }
         return $data;
     }
