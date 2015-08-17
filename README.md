@@ -33,4 +33,4 @@ TODO:
 
 If you are willing to help me with these three points you can send me the patch
 files to my email. I invested lots of time trying to fix the css issue, but I
-couldn't figure out how to do it; anyway, it doesn't look that bad :-)
+couldn't figure out how to do it; anyway, it doesn't look that bad :-) 
