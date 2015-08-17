@@ -199,9 +199,7 @@ class Config {
             if ($saveOnNull) {
                 $this->setProp('cookieExpTime', $cookieExpTime);
             }
-            $this->log("cookieExpTime not set");
-        } else
-            $this->log("Got cookieExpTime: $cookieExpTime");
+        }
         return $cookieExpTime;
     }
 
@@ -223,9 +221,7 @@ class Config {
             if ($saveOnNull) {
                 $this->setProp('cookieExpTimeIntv', $cookieExpTimeIntv);
             }
-            $this->log("cookieExpTimeIntv not set");
-        } else
-            $this->log("Got cookieExpTimeIntv: $cookieExpTimeIntv");
+        }
         return $cookieExpTimeIntv;
     }
 
@@ -283,11 +279,6 @@ class Config {
         $cookieValue = isset($_COOKIE[$cookieName]) ? $_COOKIE[$cookieName] :
                            null;
 
-        if ($cookieValue !== null)
-            $this->log("Got cookie: $cookieName, value: $cookieValue");
-        else
-            $this->log("Cokie not found: $cookieName");
-
         return $cookieValue;
     }
 
@@ -312,8 +303,6 @@ class Config {
         setcookie($cookieName, $cookieValue, $cookieExpDate->format('U'),
             '/'); 
 
-        $this->log("Set cookie: $cookieName to $cookieValue exp: " . $cookieExpDate->format($this->getPhpDateTimeFormat()));
-
         //I din't get this working, so, I had to use php cookie functions
         //$response->addCookie($cookieName, $cookieValue, $cookieExpDate);
         //return $response;
@@ -336,7 +325,6 @@ class Config {
         $response = new Response();
         $response->invalidateCookie('AGChecked');
         */
-        $this->log("Unsetting cookie: $cookieName");
         unset($_COOKIE[$cookieName]);
 
         //It seems that unsetting it isn't enough, so, we set it with a time in
@@ -372,7 +360,6 @@ class Config {
         if ($lastVisit === null) {
             $lastVisit = $this->setLastVisitCookie(); 
         }
-        $this->log("Got AGLastVisit: $lastVisit");
         return $lastVisit;
     }
 
@@ -416,7 +403,6 @@ class Config {
                 $this->getPhpDateFormat(),
                 $lastVisitCookie);
 
-            $this->log($lastVisitDate->format($this->getPhpDateTimeFormat()) . ' <= ' . $forcedExpDate->format($this->getPhpDateTimeFormat()));
             if ($lastVisitDate <= $forcedExpDate) {
                 $this->expireCheckedCookie();
             }
@@ -458,9 +444,7 @@ class Config {
         $forcedExpDate = $this->getProp('forcedExpDate');
         if ($forcedExpDate === null) {
             $forcedExpDate = '';
-            $this->log("forcedExpDate not set");
-        } else
-            $this->log("Got forcedExpDate: $forcedExpDate");
+        }
         return $forcedExpDate;
     }
 

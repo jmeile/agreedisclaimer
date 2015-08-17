@@ -31,5 +31,4 @@ class AppTest extends TestCase {
         $appManager = $this->container->query('OCP\App\IAppManager');
         $this->assertTrue($appManager->isInstalled('agreedisclaimer'));
     }
-
 }
