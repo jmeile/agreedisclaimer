@@ -12,6 +12,8 @@ namespace OCA\AgreeDisclaimer\Hooks;
 
 use OCA\AgreeDisclaimer\AppInfo\Application;
 
+use OCP\IRequest;
+
 use OC\User\LoginException;
 
 use OCP\IUserManager;
@@ -29,14 +31,21 @@ class UserHooks {
     /** @var IL10N    Translation service */
     private $l10n;
 
+    /** @var IRequest   Request from which the hook was called */
+    private $request;
+
     /**
      * Creates an UserHooks object 
      *
      * @param IUserManager $userManager    UserManager used by the hook
+     * @param IRequest     $request        Request from which the hook was
+     *            called
      * @param IL10N        $l10n           Translation service
      */
-    public function __construct(IUserManager $userManager, IL10N $l10n){
+    public function __construct(IUserManager $userManager, IRequest $request,
+                        IL10N $l10n){
         $this->userManager = $userManager;
+        $this->request = $request;
         $this->l10n = $l10n;
     }
 
@@ -52,7 +61,16 @@ class UserHooks {
             $appName = $app->getAppName(); 
             $config = $app->getConfig();
 
-            if(!isset($_POST[$appName. 'Checkbox'])) {
+            $isDav = $this->request->getScriptName() === '/remote.php';
+            $disclaimerChecked = isset($_POST[$appName. 'Checkbox']);
+
+            if (
+                //For dav requests, don't throw the exception; otherwise sync
+                //won't work
+                (!$isDav)
+                //If the "agree" checkbox wasn't checked, throw an exception
+             && (!$disclaimerChecked)
+            ){
                 //If the "agree" checkbox wasn't checked, then an throw an
                 //exception
                 if ($config->getUseCookie()) {

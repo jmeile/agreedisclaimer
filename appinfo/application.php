@@ -131,6 +131,7 @@ class Application extends App {
         $container->registerService('UserHooks', function($c) {
             return new UserHooks(
                 $c->query('ServerContainer')->getUserManager(),
+                $c->query('Request'),
                 $c->getServer()->getL10N($c->query('AppName'))
             );
         });
