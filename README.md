@@ -30,7 +30,6 @@ https://github.com/jmeile/agreedisclaimer/issues
 TODO:
 * Fix the style sheets so that the pdf icon gets vertical aligned.
 * Allow to upload text and pdf files through the admin settings
-* Add a cookie to indicate that the user already agreed the disclaimer.
 
 If you are willing to help me with these three points you can send me the patch
 files to my email. I invested lots of time trying to fix the css issue, but I
