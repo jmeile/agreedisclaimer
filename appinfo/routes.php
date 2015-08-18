@@ -17,4 +17,8 @@ return ['routes' => [
     /** Gets the info of the disclaimer files and the cookie configuration */
     ['name' => 'settings#get_settings',
      'url' => '/settings/get_settings', 'verb' => 'GET'],
+
+    /** Gets the info of the disclaimer files */
+    ['name' => 'settings#get_files',
+     'url' => '/settings/get_files', 'verb' => 'GET'],
 ]];
