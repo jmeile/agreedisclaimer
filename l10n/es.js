@@ -46,6 +46,9 @@ OC.L10N.register(
     "Disclaimer of liability":
     "Exclusión de responsabilidad",
 
+    "Disclaimer type":
+    "Tipo",
+
     "Done":
     "Cerrar",
 
@@ -55,8 +58,17 @@ OC.L10N.register(
     "File not found":
     "Archivo no encontrado",
 
+    "General Terms and conditions":
+    "Términos y condiciones generales de uso",
+
+    "I accept the %s1general terms and conditions%s2":
+    "Acepto los %s1términos generales de uso%s2",
+
     "I have read and understood the %s1disclaimer of liability%s2":
     "He leído y entendido la %s1exclusión de responsabilidad%s2",
+
+    "I have read and understood the %s1legal disclaimer%s2":
+    "He leído y entendido el %s1aviso legal%s2",
 
     "It can be a two character code, ie: %s or a five character code, ie: %s":
     "Puede ser un código de dos caracteres, ej: %s o de 5 caracteres, ej: %s",
@@ -75,6 +87,9 @@ OC.L10N.register(
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "En caso de que el archivo para el idioma por defecto no exista, el usuario verá un error al intentar leer el texto",
+
+    "Legal disclaimer":
+    "Aviso legal",
 
     "Likewise put your pdf files under":
     "De modod similar, guarde sus archivos pdf en",

@@ -40,6 +40,9 @@
     "Disclaimer of liability":
     "",
 
+    "Disclaimer type":
+    "",
+
     "Done":
     "",
 
@@ -49,10 +52,25 @@
     "File not found":
     "",
 
+    "General Terms and conditions":
+    "",
+
+    "I accept the %s1general terms and conditions%s2":
+    "",
+
     "I have read and understood the %s1disclaimer of liability%s2":
     "",
 
+    "I have read and understood the %s1legal disclaimer%s2":
+    "",
+
     "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "",
+
+    "I have read and understood the %s1GTCs%s2":
+    "",
+
+    "I have read and understood the %s1legal disclaimer%s2":
     "",
 
     "It can be a two character code, ie: %s or a five character code, ie: %s":
@@ -68,6 +86,9 @@
     "",
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
+    "",
+
+    "Legal disclaimer":
     "",
 
     "Likewise put your pdf files under":

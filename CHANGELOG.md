@@ -1,3 +1,16 @@
+#AgreeDisclaimer (0.1.2) - 18.08.2015
+
+##CHANGES
+* Fixed: The get_files route was renamed to: get_settings, this was a mistake:
+  the get_settings is being used by the login page. The get_files route is
+  needed in the admin page when changing the value of the default language
+  combobox, so, the get_files route was added again and it will only returned
+  the information about the files, but not the rest of the settings.
+
+* Added a new feature to change the disclaimer types; right now we have:
+  disclaimer of liability, legal disclaimer, and general terms and conditions.
+  This will be reflected in the message of the login page.
+
 #AgreeDisclaimer (0.1.1) - 16.08.2015
 
 ##CHANGES

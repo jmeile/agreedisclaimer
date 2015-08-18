@@ -44,6 +44,9 @@
     "Disclaimer of liability":
     "Haftungsablehnung",
 
+    "Disclaimer type":
+    "Typ",
+
     "Done":
     "Schließen",
 
@@ -53,11 +56,20 @@
     "File not found":
     "Datei nicht gefunden",
 
-    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
-    "Fals wahr, es heißt der Benutzer hat die Webseite bereits besucht und die Haftungsablehnung zugestimmt",
+    "General Terms and conditions":
+    "Allgemeine Geschäftsbedingungen",
+
+    "I accept the %s1general terms and conditions%s2":
+    "Ich akzeptiere die %s1allgemeine Geschäftsbedingungen%s2",
 
     "I have read and understood the %s1disclaimer of liability%s2":
     "Ich akzeptiere die %s1Ablehnung der Haftung%s2",
+
+    "I have read and understood the %s1legal disclaimer%s2":
+    "Ich akzeptiere den %s1Rechtlichen Hinweis%s2",
+
+    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "Fals wahr, es heißt der Benutzer hat die Webseite bereits besucht und die Haftungsablehnung zugestimmt",
 
     "It can be a two character code, ie: %s or a five character code, ie: %s":
     "Es kann entweder einer zwei Zeichen-Kode, z.B.: %s oder einer fünf Zeichen-Kode, z.B.: %s sein",
@@ -73,6 +85,9 @@
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "Sollte die Datei der Standardsprache nicht existieren, dann wird den Benutzer eine Fehlermeldung sehen, sobald er den Text versuch zu lesen",
+
+    "Legal disclaimer":
+    "Rechtlicher Hinweis",
 
     "Likewise put your pdf files under":
     "In ähnlicher Weise speicher die PDF-Dateien unter",

@@ -27,6 +27,8 @@ $(document).ready(function(){
     var errorPdf;
     var useCookie;
     var disclaimerAccepted = false;
+    var disclaimerText = '';
+    var disclaimerTitle = '';
 
     /**
      * Ajax request for calling the settings#get_settings route
@@ -41,6 +43,8 @@ $(document).ready(function(){
             showTxt = settings['txtFileData']['value'];
             showPdf = settings['pdfFileData']['value'];
             useCookie = settings['cookieData']['value']; 
+            disclaimerText = t(appName, settings['textData']['text']);
+            disclaimerTitle = t(appName, settings['textData']['name']);
 
             if (showTxt) {
                 if (settings['txtFileData']['error'] === '') {
@@ -86,8 +90,6 @@ $(document).ready(function(){
         $('#password').parent().removeClass("groupbottom");
         $('#password').parent().addClass("groupmiddle");
 
-        var text = t(appName, 'I have read and understood the ' +
-            '%s1disclaimer of liability%s2');
         var keywords;
         if (showTxt) {
             //If the link to the txt file is supposed to be shown, the
@@ -104,7 +106,7 @@ $(document).ready(function(){
                 '%s2': ''
             }
         }
-        text = multiple_replace(text, keywords); 
+        disclaimerText = multiple_replace(disclaimerText, keywords); 
 
         pdfLink = '';
         if (showPdf) {
@@ -133,7 +135,7 @@ $(document).ready(function(){
         }
         disclaimerHtml = disclaimerHtml + '/>\n' +
                              '    <div id="' + appName + 'Div">\n' +
-                             '        ' + text + '\n' +
+                             '        ' + disclaimerText + '\n' +
                              '    </div>\n' + 
                                   pdfLink +
                              '</div>';
@@ -202,7 +204,7 @@ $(document).ready(function(){
      */
     function injectDisclaimerDialog(disclaimerText) {
         var dialogHtml;
-        var title = t(appName, 'Disclaimer of liability');
+        var title = disclaimerTitle; 
 
         dialogHtml = '<div id="' + appName + 'Dialog"\n' + 
                      '     title="' + title + '">\n' +

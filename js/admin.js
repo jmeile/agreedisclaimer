@@ -30,9 +30,19 @@ $(document).ready(function() {
     var cookieExpTimeProp = appName + 'cookieExpTime';
     var cookieExpTimeIntvProp = cookieExpTimeProp + 'Intv';
     var forcedExpDateProp = appName + 'forcedExpDate';
+    var disclaimerTypeProp = appName + 'disclaimerType';
+
 
     var userLang = OC.getLocale().substr(0,2);
     initDatePickerLocale(appName, userLang);
+
+    /**
+     * Catches the 'change' event of the '<appName>disclaimerType' select
+     */
+    $('#' + disclaimerTypeProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'disclaimerType', propValue);
+    });
 
     var datepickerUserFormat = $.datepicker.regional[userLang]['dateFormat'];
     var datepickerAppFormat = $('#' + appName + 'datepickerAppFormat').val();

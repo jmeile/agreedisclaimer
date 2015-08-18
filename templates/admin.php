@@ -26,6 +26,7 @@ $cookieExpTimeProp = $_['appName'] . 'cookieExpTime';
 $cookieExpTimeIntvProp = $cookieExpTimeProp . 'Intv';
 $forcedExpDateProp = $_['appName'] . 'forcedExpDate';
 $datepickerAppFormatProp = $_['appName'] . 'datepickerAppFormat';
+$disclaimerTypeProp = $_['appName'] . 'disclaimerType';
 
 /**
  * Adds the utils.js file to the settings page
@@ -50,61 +51,78 @@ style($_['appName'], 'admin');
 ?>
 
 <div class="section" id="<?php p($_['appName']); ?>">
-<h2><?php p($l->t('Agree disclaimer')); ?></h2>
-<input id="<?php p($maxAppTxtSizeProp); ?>" type="hidden"
-       value="<?php p($_['txtFileData']['maxAppSize']); ?>"/>
-<input id="<?php p($datepickerAppFormatProp); ?>" type="hidden"
-       value="<?php p($_['datepickerAppFormat']); ?>"/>
-<label for="<?php p($defaultLangProp); ?>">
-    <?php p($l->t('Default language for the text')); ?>
-</label>&nbsp;
-<select id="<?php p($defaultLangProp); ?>"
-    name="<?php p($defaultLangProp); ?>">
-    <option value="<?php p($_['currentLang']['code']); ?>">
-        <?php p($_['currentLang']['name']); ?>
-    </option>
-    <?php foreach($_['commonLanguages'] as $language): ?>
-        <option value="<?php p($language['code']); ?>">
-            <?php p($language['name']); ?>
+    <h2><?php p($l->t('Agree disclaimer')); ?></h2>
+    <input id="<?php p($maxAppTxtSizeProp); ?>" type="hidden"
+           value="<?php p($_['txtFileData']['maxAppSize']); ?>"/>
+    <input id="<?php p($datepickerAppFormatProp); ?>" type="hidden"
+           value="<?php p($_['datepickerAppFormat']); ?>"/>
+    <label for="<?php p($defaultLangProp); ?>">
+        <?php p($l->t('Default language for the text')); ?>
+    </label>&nbsp;
+    <select id="<?php p($defaultLangProp); ?>"
+        name="<?php p($defaultLangProp); ?>">
+        <option value="<?php p($_['currentLang']['code']); ?>">
+            <?php p($_['currentLang']['name']); ?>
         </option>
-    <?php endforeach; ?>
-    <optgroup label="––––––––––"></optgroup>
-    <?php foreach($_['availableLanguages'] as $language): ?>
-        <option value="<?php p($language['code']); ?>">
-            <?php p($language['name']); ?>
-        </option>
-    <?php endforeach; ?>
-</select><a id="<?php p($defaultLangProp . 'Help'); ?>"
-        class="<?php p($_['appName'] . '_help_button'); ?> icon-info svg"
-        title="<?php p($l->t('Show/Hide help')); ?>"></a><br/>
-<div class="<?php p($_['appName'] . '_help_content'); ?>"
-     id="<?php p($defaultLangProp . 'HelpContent' ) ?>">
-    <?php p($l->t('To enable more languages, put your text files '.
-                  'here')); ?>:
-    <br/>
-    <b><?php p($_['txtFileData']['basePath'] . '/');
-         p($_['filePreffix']); ?>_&lt;lang_code&gt;.txt</b><br/>
-    <?php p($l->t('Where')); ?>:<br/>
-    <ul>
-        <li>
-            <?php print_unescaped($l->t('%s is the language code for the ' .
-                'respective disclaimer translation',
-                '<b>&lt;lang_code&gt;:</b>')); ?>. 
-            <?php print_unescaped($l->t('It can be a two character code, ' .
-                'ie: %s or a five character code, ie: %s',
-                array("<i>'en'</i>", "<i>'de_CH'</i>"))); ?>
-        </li>
-    </ul><br/>
-    <?php p($l->t('Likewise put your pdf files under')); ?>:<br/>
-    <b><?php p($_['pdfFileData']['basePath'] . '/');
-             p($_['filePreffix']); ?>_&lt;lang_code&gt;.pdf</b>
-    <br/><br/>
-    <?php p($l->t('If the file for the user language doesn\'t exist, ' .
-            'then the file for the default language will be used')); ?>. 
+        <?php foreach($_['commonLanguages'] as $language): ?>
+            <option value="<?php p($language['code']); ?>">
+                <?php p($language['name']); ?>
+            </option>
+        <?php endforeach; ?>
+        <optgroup label="––––––––––"></optgroup>
+        <?php foreach($_['availableLanguages'] as $language): ?>
+            <option value="<?php p($language['code']); ?>">
+                <?php p($language['name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select><a id="<?php p($defaultLangProp . 'Help'); ?>"
+               class="<?php p($_['appName'] . '_help_button'); ?> icon-info svg"
+               title="<?php p($l->t('Show/Hide help')); ?>"></a><br/>
+    <div class="<?php p($_['appName'] . '_help_content'); ?>"
+         id="<?php p($defaultLangProp . 'HelpContent' ) ?>">
+        <?php p($l->t('To enable more languages, put your text files '.
+                      'here')); ?>:
+        <br/>
+        <b><?php p($_['txtFileData']['basePath'] . '/');
+             p($_['filePreffix']); ?>_&lt;lang_code&gt;.txt</b><br/>
+        <?php p($l->t('Where')); ?>:<br/>
+        <ul>
+            <li>
+                <?php print_unescaped($l->t('%s is the language code for the ' .
+                    'respective disclaimer translation',
+                    '<b>&lt;lang_code&gt;:</b>')); ?>. 
+                <?php print_unescaped($l->t('It can be a two character code, ' .
+                    'ie: %s or a five character code, ie: %s',
+                    array("<i>'en'</i>", "<i>'de_CH'</i>"))); ?>
+            </li>
+        </ul><br/>
+        <?php p($l->t('Likewise put your pdf files under')); ?>:<br/>
+        <b><?php p($_['pdfFileData']['basePath'] . '/');
+                 p($_['filePreffix']); ?>_&lt;lang_code&gt;.pdf</b>
+        <br/><br/>
+        <?php p($l->t('If the file for the user language doesn\'t exist, ' .
+                'then the file for the default language will be used')); ?>. 
         <?php p($l->t('In case that the file for the default language ' .
                 'doesn\'t exist, then the user will see an error message ' .
                 'when trying to read the text')); ?>.<br/><br/>
     </div>
+    <?php p($l->t('Disclaimer type') . ':'); ?>&nbsp;
+    <select name="<?php p($disclaimerTypeProp); ?>"
+            id="<?php p($disclaimerTypeProp); ?>">
+        <?php 
+            foreach($_['disclaimerTypes'] as $disclaimerValue
+                                          => $disclaimerType):
+        ?>
+            <option value="<?php p($disclaimerValue); ?>" 
+                <?php
+                    if ($disclaimerValue == $_['textData']['value']) {
+                        p('selected');
+                    }
+                ?>>
+                <?php p($l->t($disclaimerType['name'])); ?>
+            </option>
+        <?php endforeach; ?>
+    </select><br/>
     <input type="checkbox" id="<?php p($txtFileProp); ?>"
            name="<?php p($txtFileProp); ?>"
            <?php if ($_['txtFileData']['value']) p('checked'); ?>/>

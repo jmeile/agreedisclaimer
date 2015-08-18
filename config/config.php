@@ -39,8 +39,11 @@ class Config {
      */
     private $urlGenerator;
 
-    /** Logger service */
+    /** @var ILogger    Logger service */
     private $logger;
+
+    /** @var array    Disclaimer types */
+    private $disclaimerTypes;
 
     /**
      * Creates a Config object an registers the admin page for the app
@@ -76,6 +79,23 @@ class Config {
         $container->registerParameter('phpDateFormat', 'm/d/Y');
         $container->registerParameter('datepickerDateFormat', 'mm/dd/yy');
         $container->registerParameter('phpTimeFormat', 'H:i');
+
+        //Please note that the disclaimer types must always have the
+        //placeholders: %s1 and %s2, this will be replaced afterwards by an html
+        //anchor tag '<a>' if the txtFile property is enabled. You may add your
+        //own here, but remember to translate them in the l10n files
+        $this->disclaimerTypes = [];
+        $this->disclaimerTypes['liability']['name'] = 'Disclaimer of liability';
+        $this->disclaimerTypes['liability']['text'] = 'I have read and ' .
+            'understood the %s1disclaimer of liability%s2';
+
+        $this->disclaimerTypes['legal']['name'] = 'Legal disclaimer';
+        $this->disclaimerTypes['legal']['text'] = 'I have read and ' .
+            'understood the %s1legal disclaimer%s2';
+
+        $this->disclaimerTypes['gtc']['name'] = 'General Terms and conditions';
+        $this->disclaimerTypes['gtc']['text'] = 'I accept ' .
+            'the %s1general terms and conditions%s2';
     }
 
     /**
@@ -510,6 +530,37 @@ class Config {
             $data['cookieExpTimeIntv'] = ''; 
             $data['forcedExpDate'] = ''; 
         }
+        return $data;
+    }
+
+    /**
+     * Gets the disclaimer texts
+     *
+     * @return array    The disclaimer texts as an array of the form
+     *                  ['<disclaimerType>' => [
+     *                          'name' => '<disclaimerName>',
+     *                          'text' => '<disclaimerText>'
+     *                      ],...
+     *                  ]
+     */
+    public function getDisclaimerTypes() {
+        return $this->disclaimerTypes;
+    }
+
+    /**
+     * Gets the choosen disclaimer text 
+     *
+     * @return array   The choosen disclaimer text as an array of the form
+     *                 ['value' => '<disclaimerType>',
+     *                  'name'  => '<disclaimerName>',
+     *                  'text'  => '<disclaimerText>'
+     *                 ]
+     */
+    public function getDisclaimerType() {
+        $data = [];
+        $data['value'] = $this->getProp('disclaimerType', 'liability');
+        $data['name'] = $this->disclaimerTypes[$data['value']]['name'];
+        $data['text'] = $this->disclaimerTypes[$data['value']]['text'];
         return $data;
     }
 

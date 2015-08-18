@@ -46,6 +46,9 @@ OC.L10N.register(
     "Disclaimer of liability":
     "Haftungsablehnung",
 
+    "Disclaimer type":
+    "Typ",
+
     "Done":
     "Schließen",
 
@@ -55,8 +58,17 @@ OC.L10N.register(
     "File not found":
     "Datei nicht gefunden",
 
+    "General Terms and conditions":
+    "Allgemeine Geschäftsbedingungen",
+
+    "I accept the %s1general terms and conditions%s2":
+    "Ich akzeptiere die %s1allgemeine Geschäftsbedingungen%s2",
+
     "I have read and understood the %s1disclaimer of liability%s2":
     "Ich akzeptiere die %s1Ablehnung der Haftung%s2",
+
+    "I have read and understood the %s1legal disclaimer%s2":
+    "Ich akzeptiere den %s1Rechtlichen Hinweis%s2",
 
     "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
     "Fals wahr, es heißt der Benutzer hat die Webseite bereits besucht und die Haftungsablehnung zugestimmt",
@@ -75,6 +87,9 @@ OC.L10N.register(
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "Sollte die Datei der Standardsprache nicht existieren, dann wird den Benutzer eine Fehlermeldung sehen, sobald er den Text versuch zu lesen",
+
+    "Legal disclaimer":
+    "Rechtlicher Hinweis",
 
     "Likewise put your pdf files under":
     "In ähnlicher Weise speicher die PDF-Dateien unter",
