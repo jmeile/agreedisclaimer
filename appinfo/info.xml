@@ -6,7 +6,7 @@
         App to show a disclaimer that the user has to agree before accessing
         ownCloud.
     </description>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
     <licence>MIT</licence>
     <author>Josef Meile</author>
     <namespace>AgreeDisclaimer</namespace>
