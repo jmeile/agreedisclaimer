@@ -121,4 +121,29 @@ class SettingsController extends Controller {
                                    $isAdminForm, $defaultLang);
         return $data;
     }
+
+    /**
+     * Gets the disclaimer layout and the file information
+     *
+     * @return array   Array with the file information for the txt and pdf
+     *         files and the disclaimer layout. See the Config class methods:
+     *         getTxtFileData, getPdfFileData, and getDisclaimerType for more
+     *         info about the returned array, which has the format
+     *         [
+     *             'txtFileData'        => <txt_file_data>,
+     *             'pdfFileData'        => <pdf_file_data>,
+     *             'textData'           => <text_data>
+     *             'layout'             => <disclaimer_layout>
+     *         ]
+     */
+    function getDisclaimerLayout() {
+        $data = [];
+        $disclaimerLayout = $this->config->getDisclaimerLayout();
+        if ($disclaimerLayout !== '') {
+            $data = $this->getFiles();
+            $data['textData'] = $this->config->getDisclaimerType();
+        }
+        $data['layout'] = $disclaimerLayout; 
+        return $data;
+    }
 }

@@ -21,4 +21,8 @@ return ['routes' => [
     /** Gets the info of the disclaimer files */
     ['name' => 'settings#get_files',
      'url' => '/settings/get_files', 'verb' => 'GET'],
+
+    /** Gets the info of the disclaimer files and its layout */
+    ['name' => 'settings#get_disclaimer_layout',
+     'url' => '/settings/get_disclaimer_layout', 'verb' => 'GET'],
 ]];

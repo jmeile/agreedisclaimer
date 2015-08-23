@@ -27,6 +27,7 @@ $cookieExpTimeIntvProp = $cookieExpTimeProp . 'Intv';
 $forcedExpDateProp = $_['appName'] . 'forcedExpDate';
 $datepickerAppFormatProp = $_['appName'] . 'datepickerAppFormat';
 $disclaimerTypeProp = $_['appName'] . 'disclaimerType';
+$disclaimerLayoutProp = $_['appName'] . 'disclaimerLayout';
 
 /**
  * Adds the utils.js file to the settings page
@@ -56,6 +57,25 @@ style($_['appName'], 'admin');
            value="<?php p($_['txtFileData']['maxAppSize']); ?>"/>
     <input id="<?php p($datepickerAppFormatProp); ?>" type="hidden"
            value="<?php p($_['datepickerAppFormat']); ?>"/>
+    <label for="<?php p($disclaimerLayoutProp); ?>">
+        <?php p($l->t('Menu entry position')); ?>
+    </label>&nbsp;
+    <select name="<?php p($disclaimerLayoutProp); ?>"
+            id="<?php p($disclaimerLayoutProp); ?>">
+        <?php 
+            foreach($_['disclaimerLayouts'] as $layoutValue
+                                          => $layoutText):
+        ?>
+            <option value="<?php p($layoutValue); ?>" 
+                <?php
+                    if ($layoutValue == $_['disclaimerLayout']) {
+                        p('selected');
+                    }
+                ?>>
+                <?php p($l->t($layoutText)); ?>
+            </option>
+        <?php endforeach; ?>
+    </select><br/>
     <label for="<?php p($defaultLangProp); ?>">
         <?php p($l->t('Default language for the text')); ?>
     </label>&nbsp;
@@ -106,7 +126,9 @@ style($_['appName'], 'admin');
                 'doesn\'t exist, then the user will see an error message ' .
                 'when trying to read the text')); ?>.<br/><br/>
     </div>
-    <?php p($l->t('Disclaimer type') . ':'); ?>&nbsp;
+    <label for="<?php p($disclaimerTypeProp); ?>">
+        <?php p($l->t('Disclaimer type') . ':'); ?>
+    </label>&nbsp;
     <select name="<?php p($disclaimerTypeProp); ?>"
             id="<?php p($disclaimerTypeProp); ?>">
         <?php 

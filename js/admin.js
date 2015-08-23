@@ -31,6 +31,7 @@ $(document).ready(function() {
     var cookieExpTimeIntvProp = cookieExpTimeProp + 'Intv';
     var forcedExpDateProp = appName + 'forcedExpDate';
     var disclaimerTypeProp = appName + 'disclaimerType';
+    var disclaimerLayoutProp = appName + 'disclaimerLayout';
 
 
     var userLang = OC.getLocale().substr(0,2);
@@ -238,6 +239,14 @@ $(document).ready(function() {
         var propValue = $(this).val();
         OC.AppConfig.setValue(appName, 'defaultLang', propValue);
         reloadFileInfo(propValue);
+    });
+
+    /**
+     * Changes the disclaimerLayout applicatin settings
+     */
+    $('#' + disclaimerLayoutProp).on('change', function(){
+        var propValue = $(this).val();
+        OC.AppConfig.setValue(appName, 'disclaimerLayout', propValue);
     });
 
     /**

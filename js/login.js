@@ -17,10 +17,8 @@ $(document).ready(function(){
 
     //Application settings
     var showTxt;
-    var txtFileProp = appName + 'TxtFile';
     var txtContents;
     var showPdf;
-    var pdfFileProp = appName + 'PdfFile';
     var pdfLink;
     var pdfPath;
     var pdfIcon;
@@ -179,7 +177,7 @@ $(document).ready(function(){
             width: 'auto',
             resizable: false,
             modal: true,
-            closeText: 'Close',
+            closeText: t(appName, 'Close'),
             buttons: [
                 {
                     text: t(appName, 'Ok'),
@@ -224,7 +222,7 @@ $(document).ready(function(){
             width: 550,
             resizable: false,
             modal: true,
-            closeText: 'Close',
+            closeText: t(appName, 'Close'),
             buttons: [
                 {
                     text: t(appName, 'Agree'),

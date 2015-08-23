@@ -188,6 +188,23 @@ class Application extends App {
     }
 
     /**
+     * Renders the disclaimer on the user's menu
+     */
+    public function renderDisclaimerMenu() {
+        $container = $this->getContainer();
+        $session = $container->query('OCP\IUserSession');
+        if ($session->isLoggedIn()) {
+            $data = [
+                'appName'   => $this->appName,
+            ];
+            $templateResponse = new TemplateResponse($this->appName, 'user',
+                                        $data, 'blank');
+            return $templateResponse->render();
+        }
+        return null;
+    }
+
+    /**
      * Gets the configuration of this application
      *
      * @return Config   The configuration object

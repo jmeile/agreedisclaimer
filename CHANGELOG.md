@@ -1,3 +1,21 @@
+#AgreeDisclaimer (0.1.3) - 23.08.2015
+
+##CHANGES
+* Added a new application setting to show the disclaimer in the users area. It
+  will be rendered either at the top-right or top-left corner.
+
+As a consequense following changes were done:
+* Added renderDisclaimerMenu method to the Application class
+* Added get_disclaimer_layout route and its dispatcher: getDisclaimerLayout to
+  the SettingsController class.
+* Added the properties following properties to the Config class:
+  - disclaimerLayout: Has the current layout used by the disclaimer in the
+    user's area: '' (None), 'top-right', and 'top-left'.
+  - disclaimerLayouts: Array containing all possible layouts.
+* Added the following methods to the Config class:
+  - getDisclaimerLayout: Gets the disclaimer position within the user's page
+  - getDisclaimerLayouts: Gets the different layouts in the user area
+
 #AgreeDisclaimer (0.1.2) - 18.08.2015
 
 ##CHANGES

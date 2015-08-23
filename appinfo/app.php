@@ -21,4 +21,6 @@ $templateResponse = $app->getDisclaimerForm();
 if ($templateResponse !== null){
     //The template won't be returned if the user is already logged in
     return $templateResponse->render();
+} else {
+    $app->renderDisclaimerMenu();
 }

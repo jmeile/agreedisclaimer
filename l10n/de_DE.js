@@ -19,6 +19,9 @@ OC.L10N.register(
     "By activating this setting two cookies will be set":
     "Wenn diese Option aktiviert ist, werden zwei Cookies gespeichert",
 
+    "Close":
+    "Schließen",
+
     "Contents of the file":
     "Inhalte der Datei",
 
@@ -100,6 +103,9 @@ OC.L10N.register(
     "Maximum file size in megabytes for the text file":
     "Maximum Größe der Textdatei in Megabytes",
 
+    "Menu entry position":
+    "Position innerhalb des Menüs",
+
     "mm/dd/yy":
     "dd.mm.yy",
 
@@ -111,6 +117,12 @@ OC.L10N.register(
 
     "Next":
     "Vor",
+
+    "None":
+    "Nicht anzeigen",
+
+    "Ok":
+    "Ok",
 
     "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
     "Im Gegenteil, falls den Benutzer die Webseite bereits besucht und die Haftungsablehnung zugestimmt hat, dann wird das Alter des Cookies durch den Wert von AGLastVisit gerechnet. Falls es höher als das Ablaufdatum der bisherigen Cookies, dann wird es gelöscht",
@@ -142,11 +154,17 @@ OC.L10N.register(
     "This must be set in order to prevent the download of big text files, which may block the login page":
     "Diesen Wert musst gesetzt werden um zu verhindern, dass das Hochladen von größere Text-Dateien die Anmeldung-Seite blockieren",
 
+    "To enable more languages, put your text files here":
+    "Um mehrere Sprachen zu aktivieren, bitte Ihre Dateien hier speichern",
+
     "Today":
     "Heute",
 
-    "To enable more languages, put your text files here":
-    "Um mehrere Sprachen zu aktivieren, bitte Ihre Dateien hier speichern",
+    "Top-Left corner":
+    "Oben-Links",
+
+    "Top-Right corner":
+    "Oben-Rechts",
 
     "Use a cookie for remembering the user's choice":
     "Ein Cookie nutzen um die Auswahl des Benutzers zu merken",

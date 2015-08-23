@@ -34,3 +34,11 @@ TODO:
 If you are willing to help me with these three points you can send me the patch
 files to my email. I invested lots of time trying to fix the css issue, but I
 couldn't figure out how to do it; anyway, it doesn't look that bad :-) 
+
+##Upgrading
+Before you update the app, please make copy the contents of the folders:
+"agreedisclaimer/pdf", "agreedisclaimer/txt", and, if you translated/modified
+your own languages, then also copy "l10n". Afterwards, do the update and
+overwrite the first two folders. Then overwrite only the files you modified from
+the "l10n" folder. In order to keep the translations up to date you need to
+translate the missing messages from the template "l10n/en.pot".

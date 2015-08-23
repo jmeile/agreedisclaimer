@@ -96,6 +96,12 @@ class Config {
         $this->disclaimerTypes['gtc']['name'] = 'General Terms and conditions';
         $this->disclaimerTypes['gtc']['text'] = 'I accept ' .
             'the %s1general terms and conditions%s2';
+
+        $this->disclaimerLayouts = [
+            ''          => 'None',
+            'top-right' => 'Top-Right corner',
+            'top-left'  => 'Top-Left corner',
+        ];
     }
 
     /**
@@ -565,6 +571,25 @@ class Config {
     }
 
     /**
+     * Gets the disclaimer position within the user's page
+     *
+     * @return string   The disclaimer position. Possible values are:
+     *      - '': Won't be shown
+     *      - 'top-right': Will be shown on the top right corner
+     *      - 'top-left': Will be shown on the top left corner
+     */
+    public function getDisclaimerLayout() {
+        return $this->getProp('disclaimerLayout', '');
+    }
+
+    /**
+     * Gets the different layouts in the user area
+     */
+    public function getDisclaimerLayouts() {
+        return $this->disclaimerLayouts;
+    }
+
+    /**
      * Gets the file name for the specified user language.
      *
      * @param bool   $fileExists          Returns either if the file exists or
@@ -659,7 +684,7 @@ class Config {
      *                   default language occurs after getting the info of the
      *                   file
      *
-     * @return array    An array with the txt file information. It has the
+     * @return array    An array with the file information. It has the
      *                  following format:
      *                  [
      *                      'value'    => <is_setting_enabled>,

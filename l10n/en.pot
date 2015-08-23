@@ -13,6 +13,9 @@
     "Automatically expire cookies older than":
     "",
 
+    "Close":
+    "",
+
     "Could not read contents from file: %s":
     "",
 
@@ -100,6 +103,9 @@
     "Maximum file size in megabytes for the text file":
     "",
 
+    "Menu entry position":
+    "",
+
     "Months":
     "",
 
@@ -110,6 +116,12 @@
     "",
 
     "Next":
+    "",
+
+    "None":
+    "",
+
+    "Ok":
     "",
 
     "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
@@ -146,6 +158,12 @@
     "",
 
     "Today":
+    "",
+
+    "Top-Left corner":
+    "",
+
+    "Top-Right corner":
     "",
 
     "Use a cookie for remembering the user's choice":
