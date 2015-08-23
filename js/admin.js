@@ -269,23 +269,23 @@ $(document).ready(function() {
             contentType: 'application/json; charset=utf-8',
             success: function(files) {
                 if (files['txtFileData']['error'] === '') {
-                    $('#' + txtFileContentsProp).html(
+                    $('#' + txtFileContentsProp).text(
                         files['txtFileData']['contents']
                      );
                 } else {
-                    $('#' + txtFileContentsProp).html(
+                    $('#' + txtFileContentsProp).text(
                         files['txtFileData']['error']
                      );
                 }
-                $('#' + txtFilePathProp).html(files['txtFileData']['path']);
+                $('#' + txtFilePathProp).text(files['txtFileData']['path']);
 
                 if (files['pdfFileData']['error'] === '') {
                     var pdfLink = files['pdfFileData']['url'];
                     pdfLink = '<a href="' + pdfLink + '" target="_blank">' +
                         files['pdfFileData']['name'] +'</a>';
-                    $('#' + pdfFileUrlProp).html(pdfLink);
+                    $('#' + pdfFileUrlProp).text(pdfLink);
                 } else {
-                    $('#' + pdfFileUrlProp).html(files['pdfFileData']['error']);
+                    $('#' + pdfFileUrlProp).text(files['pdfFileData']['error']);
                 }
             }
         });

@@ -144,7 +144,7 @@ $(document).ready(function(){
             appName + '-' + disclaimerLayout);
 
         var disclaimerLink = $('<a />');
-        disclaimerLink.html(disclaimerTitle);
+        disclaimerLink.text(disclaimerTitle);
         menuEntry.append(disclaimerLink);
         if (showTxt) {
             injectDisclaimerDialog(txtContents);
