@@ -1,0 +1,62 @@
+/**
+ * ownCloud - agreedisclaimer
+ *
+ * This file is licensed under the MIT License. See the LICENSE file.
+ *
+ * @author Josef Meile <technosoftgratis@okidoki.com.co>
+ * @copyright Josef Meile 2015
+ *
+ * Some code was taken from the Imprint app by Christian Reiner
+ */
+
+/**
+ * Style sheets for the disclaimer menu entry 
+ */
+
+/** Span containing the layout link on the menu */
+span.agreedisclaimer-span {
+    margin: 0;
+    padding: 0 15px;
+    position: relative;
+    display: inline-block;
+}
+
+span.agreedisclaimer-top-left > a > img,
+span.agreedisclaimer-top-right > a > img {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+span.agreedisclaimer-top-right,
+span.agreedisclaimer-top-left {
+    line-height: 45px;
+}
+
+span.agreedisclaimer-top-right > a,
+span.agreedisclaimer-top-left > a {
+    font-size: 16px;
+    color: #ffffff; 
+    opacity: 0.75;
+}
+
+span.agreedisclaimer-top-right > a:hover,
+span.agreedisclaimer-top-left > a:hover {
+    opacity: 1;
+}
+
+span.agreedisclaimer-top-right {
+    float: right;
+}
+
+span.agreedisclaimer-top-left {
+    float: left;
+}
+
+#header #owncloud,
+#header .menutoggle {
+    position: relative;
+    left: initial;
+    top: initial;
+    float: left;
+    left: 0;
+}
