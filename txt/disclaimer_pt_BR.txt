@@ -1,0 +1,11 @@
+Por gentileza, observe que este serviço de dados não deve ser utilizado como
+uma solução de backup. Sua proposta principal é temporariamente compartilhar
+arquivos entre dois ou mais usuários. Não assumimos nenhuma responsabilidade
+por perda de dados; o usuário é responsável por manter cópias de segurança
+de seus arquivos.<br/><br/>
+
+Esta aplicação deve ser utilizada apenas para a troca de conteúdo legal. O
+usuário é total responsável no caso de qualquer violação às leis.<br/><br>
+
+Acionando o botão "Concordo", eu declaro ter lido, completamente entendido
+e aceitado estas condições.
