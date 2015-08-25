@@ -16,6 +16,9 @@ As a consequense following changes were done:
   - getDisclaimerLayout: Gets the disclaimer position within the user's page
   - getDisclaimerLayouts: Gets the different layouts in the user area
 
+* Added translations for Portugues (Brazil). Special thanks to Marcelo Subtil
+  Marcal for loading them.
+
 #AgreeDisclaimer (0.1.2) - 18.08.2015
 
 ##CHANGES

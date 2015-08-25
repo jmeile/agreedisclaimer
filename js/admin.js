@@ -283,7 +283,7 @@ $(document).ready(function() {
                     var pdfLink = files['pdfFileData']['url'];
                     pdfLink = '<a href="' + pdfLink + '" target="_blank">' +
                         files['pdfFileData']['name'] +'</a>';
-                    $('#' + pdfFileUrlProp).text(pdfLink);
+                    $('#' + pdfFileUrlProp).html(pdfLink);
                 } else {
                     $('#' + pdfFileUrlProp).text(files['pdfFileData']['error']);
                 }
