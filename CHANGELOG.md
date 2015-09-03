@@ -1,3 +1,10 @@
+#AgreeDisclaimer (1.0.0) - 03.09.2015
+##CHANGES
+* Implemented enhacnement request:
+  - Change the whole JavaScript code to OO
+    https://github.com/jmeile/agreedisclaimer/issues/9
+* Injecting html code by using strings was replaced by jquery objects
+
 #AgreeDisclaimer (0.1.3) - 23.08.2015
 
 ##CHANGES

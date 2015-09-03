@@ -7,184 +7,219 @@
  * @copyright Josef Meile 2015
  */
 
+var AgreeDisclaimer = AgreeDisclaimer || {};
+
 /**
- * Script for injecting the disclaimer menu entry 
+ * Class for injecting the disclaimer menu entry
  */
-$(document).ready(function(){
+(function(window, $, exports, undefined) {
     'use strict';
-    /** Fix it: it would be nice to adquire it from somewhere else */
-    var appName = 'agreedisclaimer';
-    var userLang = OC.getLocale();
-    var showTxt;
-    var txtContents;
-    var showPdf;
-    var pdfLink;
-    var pdfPath;
-    var pdfIcon;
-    var errorPdf;
-    var disclaimerTitle = '';
-    var disclaimerLayout;
 
-    //Loads the txt file contents, the pdf link, and the disclaimer layout by
-    //calling the settings#get_settings route through an ajax request
-    var baseUrl = OC.generateUrl('/apps/' + appName +
-            '/settings/get_disclaimer_layout');
-    $.ajax({
-        url: baseUrl,
-        type: 'GET',
-        async: false,
-        contentType: 'application/json; charset=utf-8',
-        success: function(settings) {
-            disclaimerLayout = settings['layout']; 
-            if (disclaimerLayout !== '') {
-                showTxt = settings['txtFileData']['value'];
-                showPdf = settings['pdfFileData']['value'];
-                disclaimerTitle = t(appName, settings['textData']['name']);
+    /**
+     * Creates an UserPage object
+     *
+     * @param string appName    Application's name
+     * @param string userLang   Current user language
+     */
+    var UserPage = function(appName, userLang) {
+        this.appName = appName;
+        this.userLang = userLang;
+        this.disclaimerTitle = '';
+    };
 
-                if (showTxt) {
-                    if (settings['txtFileData']['error'] === '') {
-                        //If there weren't any error, the file contents will be
-                        //shown
-                        txtContents = settings['txtFileData']['contents'];
-                    } else {
-                        //Otherwise an error will be displayed
-                        txtContents = settings['txtFileData']['error'];
+    /**
+     * Initializes the UserPage object
+     */
+    UserPage.prototype.init = function() {
+        //Loads the txt file contents, the pdf link, and the disclaimer layout
+        //by calling the settings#get_settings route through an ajax request
+        var baseUrl = OC.generateUrl('/apps/' + this.appName +
+                '/settings/get_disclaimer_layout');
+
+        //Quick hack to be able to access the 'this' object properties. You can
+        //also achieve this by setting the context setting from ajax to 'this',
+        //then you can just write "this.prop"; however, if you want to access
+        //the ajax object itself, you won't be able to because 'this' won't
+        //reffer to it anymore
+        var obj = this;
+
+        $.ajax({
+            url: baseUrl,
+            type: 'GET',
+            async: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function(settings) {
+                obj.disclaimerLayout = settings['layout']; 
+                if (obj.disclaimerLayout !== '') {
+                    obj.showTxt = settings['txtFileData']['value'];
+                    obj.showPdf = settings['pdfFileData']['value'];
+                    obj.disclaimerTitle = t(obj.appName,
+                        settings['textData']['name']);
+
+                    if (obj.showTxt) {
+                        if (settings['txtFileData']['error'] === '') {
+                            //If there weren't any error, the file contents will
+                            //be shown
+                            obj.txtContents =
+                                settings['txtFileData']['contents'];
+                        } else {
+                            //Otherwise an error will be displayed
+                            obj.txtContents = settings['txtFileData']['error'];
+                        }
                     }
-                }
 
-                if (showPdf) {
-                    pdfIcon = settings['pdfFileData']['icon'];
-                    errorPdf = false;
-                    if (settings['pdfFileData']['error'] === '') {
-                        //If there weren't any error, a link to the pdf will be
-                        //shown
-                        pdfPath = settings['pdfFileData']['url'];
-                    } else {
-                        //Otherwise an error will be displayed
-                        pdfPath = settings['pdfFileData']['error'];
-                        errorPdf = true;
+                    if (obj.showPdf) {
+                        obj.pdfIcon = settings['pdfFileData']['icon'];
+                        obj.errorPdf = false;
+                        if (settings['pdfFileData']['error'] === '') {
+                            //If there weren't any error, a link to the pdf will
+                            //be shown
+                            obj.pdfPath = settings['pdfFileData']['url'];
+                        } else {
+                            //Otherwise an error will be displayed
+                            obj.pdfPath = settings['pdfFileData']['error'];
+                            obj.errorPdf = true;
+                        }
                     }
                 }
             }
-        }
-    });
-
+        });
+    };
 
     /**
      * Injects a dialog with the disclaimer's text
-     *
-     * @param   string  disclaimerText  Contents of the txt file
      */
-    function injectDisclaimerDialog(disclaimerText) {
+    UserPage.prototype.injectDisclaimerDialog = function() {
         var dialogDiv = $('<div />');
-        dialogDiv.attr('id', appName + 'Dialog');
-        dialogDiv.attr('title', disclaimerTitle);
+        dialogDiv.attr('id', this.appName + 'Dialog');
+        dialogDiv.attr('title', this.disclaimerTitle);
         var disclaimerTextTag = $('<p />');
-        disclaimerTextTag.html(disclaimerText);
+        disclaimerTextTag.html(this.txtContents);
         dialogDiv.append(disclaimerTextTag);
         $('body').append(dialogDiv);
 
-        $('#' + appName + 'Dialog').dialog({
+        //Quick hack to be able to access the 'this' object
+        //properties inside the jquery event handlers.
+        var obj = this;
+
+        $('#' + this.appName + 'Dialog').dialog({
             autoOpen: false,
             width: 550,
             resizable: false,
             modal: true,
-            closeText: t(appName, 'Close'),
+            closeText: t(obj.appName, 'Close'),
             buttons: [
                 {
-                    text: t(appName, 'Ok'),
+                    text: t(obj.appName, 'Ok'),
                     click: function() {
                         $(this).dialog('close');
                     }
                 },
             ]
         });
-    }
-
+    };
     /**
      * Injects an error dialog in case that the PDF file doesn't exist. It will
      * be inserted at the end of the body tag
-     *
-     * @param   string  pdfError    Text of the error message when a pdf link
-     *          couldn't be rendered properly
      */
-    function injectErrorPdfDialog(pdfError){
+    UserPage.prototype.injectErrorPdfDialog = function(){
         var dialogDiv = $('<div />');
-        dialogDiv.attr('id', appName + 'ErrorDialog');
-        dialogDiv.attr('title', t(appName, 'File not found'));
+        dialogDiv.attr('id', this.appName + 'ErrorDialog');
+        dialogDiv.attr('title', t(this.appName, 'File not found'));
         var disclaimerTextTag = $('<p />');
-        disclaimerTextTag.html(pdfError);
+        disclaimerTextTag.html(this.pdfError);
         dialogDiv.append(disclaimerTextTag);
         $('body').append(dialogDiv);
 
-        $('#' + appName + 'ErrorDialog').dialog({
+        //Quick hack to be able to access the 'this' object
+        //properties inside the jquery event handlers.
+        var obj = this;
+
+        $('#' + this.appName + 'ErrorDialog').dialog({
             autoOpen: false,
             width: 550,
             resizable: false,
             modal: true,
-            closeText: t(appName, 'Close'),
+            closeText: t(obj.appName, 'Close'),
             buttons: [
                 {
-                    text: t(appName, 'Ok'),
+                    text: t(obj.appName, 'Ok'),
                     click: function() {
                         $(this).dialog('close');
                     }
                 },
             ]
         });
-    }
+    };
 
     /**
      * Injects the menu entry into the user's area menu
      */
-    function injectDisclaimerMenuEntry() {
-        var pdfLink;
-        var menuEntry = $('<span />');
-        menuEntry.addClass(appName + '-span').addClass(
-            appName + '-' + disclaimerLayout);
+    UserPage.prototype.injectDisclaimerMenuEntry = function() {
+        if (this.disclaimerLayout !== '') {
+            var pdfLink;
+            var menuEntry = $('<span />');
 
-        var disclaimerLink = $('<a />');
-        disclaimerLink.text(disclaimerTitle);
-        menuEntry.append(disclaimerLink);
-        if (showTxt) {
-            injectDisclaimerDialog(txtContents);
-            disclaimerLink.click(function(e) {
-                $('#' + appName + 'Dialog').dialog('open');
-                e.preventDefault;
-            });
-            if (showPdf) {
-                pdfLink = $('<a />');
-            }
-        } else {
-            pdfLink = disclaimerLink;
-        }
+            menuEntry.addClass(this.appName + '-span').addClass(
+                this.appName + '-' + this.disclaimerLayout);
 
-        if (showPdf) {
-            if (!errorPdf) {
-                if (showTxt) {
-                    var pdfIconTag = $('<img />');
-                    pdfIconTag.attr('src', pdfIcon);
-                    pdfLink.append(pdfIconTag);
-                    disclaimerLink.after(pdfLink);
-                }
-                pdfLink.attr('href', pdfPath);
-                pdfLink.attr('target', '_blank');
-            } else {
-                injectErrorPdfDialog(pdfPath);
-                pdfLink.click(function(e) {
-                    $('#' + appName + 'ErrorDialog').dialog('open');
+            var disclaimerLink = $('<a />');
+            disclaimerLink.text(this.disclaimerTitle);
+            menuEntry.append(disclaimerLink);
+
+            //Quick hack to be able to access the 'this' object properties
+            //inside the jquery event handlers.
+            var obj = this;
+            if (this.showTxt) {
+                this.injectDisclaimerDialog();
+                disclaimerLink.click(function(e) {
+                    $('#' + obj.appName + 'Dialog').dialog('open');
                     e.preventDefault;
                 });
+                if (this.showPdf) {
+                    pdfLink = $('<a />');
+                }
+            } else {
+                pdfLink = disclaimerLink;
+            }
+
+            if (this.showPdf) {
+                if (!this.errorPdf) {
+                    if (this.showTxt) {
+                        var pdfIconTag = $('<img />');
+                        pdfIconTag.attr('src', this.pdfIcon);
+                        pdfLink.append(pdfIconTag);
+                        disclaimerLink.after(pdfLink);
+                    }
+                    pdfLink.attr('href', this.pdfPath);
+                    pdfLink.attr('target', '_blank');
+                } else {
+                    this.injectErrorPdfDialog();
+                    pdfLink.click(function(e) {
+                        $('#' + obj.appName + 'ErrorDialog').dialog('open');
+                        e.preventDefault;
+                    });
+                }
+            }
+
+            if (this.disclaimerLayout == 'top-right') {
+                $('#header form.searchbox').after(menuEntry);
+            } else { // disclaimerLayout == 'top-left'
+                $('#header a.menutoggle').after(menuEntry);
             }
         }
+    };
 
-        if (disclaimerLayout == 'top-right') {
-            $('#header form.searchbox').after(menuEntry);
-        } else { // disclaimerLayout == 'top-left'
-            $('#header a.menutoggle').after(menuEntry);
-        }
-    }
-    if (disclaimerLayout !== '') {
-        injectDisclaimerMenuEntry();
-    }
+    exports.UserPage = UserPage;
+})(window, jQuery, AgreeDisclaimer);
+
+$(document).ready(function() {
+    'use strict';
+    /** Fix it: it would be nice to adquire it from somewhere else */
+    var appName = 'agreedisclaimer';
+    var userLang = OC.getLocale();
+    var userPage = new AgreeDisclaimer.UserPage(appName, userLang);
+
+    userPage.init();
+    userPage.injectDisclaimerMenuEntry();
 });

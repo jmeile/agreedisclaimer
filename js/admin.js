@@ -7,209 +7,87 @@
  * @copyright Josef Meile 2015
  */
 
+var AgreeDisclaimer = AgreeDisclaimer || {};
+
 /**
- * Script to setup the html elements of the admin template
+ * Config class to read and write the application settings from the admin page 
  */
-$(document).ready(function() {
+(function(window, $, exports, undefined) {
     'use strict';
-    /** Fix it: It would be nice to adquire it from somewhere */
-    var appName = 'agreedisclaimer';
-
-    //Application settings
-    var pdfFileProp = appName + 'pdfFile';
-    var pdfFileUrlProp = pdfFileProp + 'Url';
-    var txtFileProp = appName + 'txtFile';
-    var txtFileContentsProp = txtFileProp + 'Contents';
-    var txtFilePathProp = txtFileProp + 'Path';
-    var maxAdminTxtSizeProp = appName + 'maxAdminTxtSize';
-    var maxAppTxtSize = parseInt(
-                            $('#' + appName + 'maxAppTxtSize').val()
-                        );
-    var defaultLangProp = appName + 'defaultLang';
-    var useCookieProp = appName + 'useCookie';
-    var cookieExpTimeProp = appName + 'cookieExpTime';
-    var cookieExpTimeIntvProp = cookieExpTimeProp + 'Intv';
-    var forcedExpDateProp = appName + 'forcedExpDate';
-    var disclaimerTypeProp = appName + 'disclaimerType';
-    var disclaimerLayoutProp = appName + 'disclaimerLayout';
-
-
-    var userLang = OC.getLocale().substr(0,2);
-    initDatePickerLocale(appName, userLang);
 
     /**
-     * Catches the 'change' event of the '<appName>disclaimerType' select
+     * Creates a Config object
+     *
+     * @param string                          appName
+     *            Application's name
+     * @param string                          userLang
+     *            Current user language
+     * @param AgreeDisclaimer.Utils           Utils
+     *            Utils object to access several utility functions
+     * @param AgreeDisclaimer.DatepickerUtils DatepickerUtils
+     *            Datepicker object to setup the jquery datepicker widgets
      */
-    $('#' + disclaimerTypeProp).on('change', function(){
-        var propValue = $(this).val(); 
-        OC.AppConfig.setValue(appName, 'disclaimerType', propValue);
-    });
+    var Config = function(appName, userLang, Utils, DatepickerUtils) {
+        this.appName = appName;
+        this.userLang = userLang;
+        this.utils = Utils;
+        this.datepickerUtils = DatepickerUtils;
+    };
 
-    var datepickerUserFormat = $.datepicker.regional[userLang]['dateFormat'];
-    var datepickerAppFormat = $('#' + appName + 'datepickerAppFormat').val();
+    /**
+     * Initializes the Config object
+     */
+    Config.prototype.init = function() {
+        this.pdfFileProp = this.appName + 'pdfFile';
+        this.pdfFileUrlProp = this.pdfFileProp + 'Url';
+        this.txtFileProp = this.appName + 'txtFile';
+        this.txtFileContentsProp = this.txtFileProp + 'Contents';
+        this.txtFilePathProp = this.txtFileProp + 'Path';
+        this.maxAdminTxtSizeProp = this.appName + 'maxAdminTxtSize';
+        this.maxAppTxtSize = parseInt(
+                                 $('#' + this.appName + 'maxAppTxtSize').val()
+                             );
+        this.defaultLangProp = this.appName + 'defaultLang';
+        this.useCookieProp = this.appName + 'useCookie';
+        this.cookieExpTimeProp = this.appName + 'cookieExpTime';
+        this.cookieExpTimeIntvProp = this.cookieExpTimeProp + 'Intv';
+        this.forcedExpDateProp = this.appName + 'forcedExpDate';
+        this.disclaimerTypeProp = this.appName + 'disclaimerType';
+        this.disclaimerLayoutProp = this.appName + 'disclaimerLayout';
+
+        this.datepickerUtils.initDatePickerLocale();
+        this.enableDisableCookieInputs();
+
+        if ($('#' + this.cookieExpTimeIntvProp).val() === '') {
+            $('#' + this.cookieExpTimeProp).attr('disabled', true);
+        }
+        this.datepickerUtils.configDatepicker(this.forcedExpDateProp);
+    }
 
     /**
      * Enables or disables cookie input elements according to the status of the
      * checkbox: useCookieProp
      */
-    function enableDisableCookieInputs() {
-        var useCookie = $('#' + useCookieProp).attr('checked') ? true : false;
+    Config.prototype.enableDisableCookieInputs = function() {
+        var useCookie = $('#' + this.useCookieProp).attr('checked') ? true : 
+                            false;
         if (useCookie) {
-            $('#' + cookieExpTimeIntvProp).removeAttr('disabled');
-            $('#' + forcedExpDateProp).removeAttr('disabled');
+            $('#' + this.cookieExpTimeIntvProp).removeAttr('disabled');
+            $('#' + this.forcedExpDateProp).removeAttr('disabled');
         } else {
-            $('#' + cookieExpTimeProp).attr('disabled', true);
-            $('#' + cookieExpTimeIntvProp).attr('disabled', true);
-            $('#' + forcedExpDateProp).attr('disabled', true);
+            $('#' + this.cookieExpTimeProp).attr('disabled', true);
+            $('#' + this.cookieExpTimeIntvProp).attr('disabled', true);
+            $('#' + this.forcedExpDateProp).attr('disabled', true);
 
             //Resets previous values
-            OC.AppConfig.setValue(appName, 'cookieExpTime', '');
-            $('#' + cookieExpTimeProp).val('');
-            OC.AppConfig.setValue(appName, 'cookieExpTimeIntv', '');
-            $('#' + cookieExpTimeIntvProp).val('');
-            OC.AppConfig.setValue(appName, 'forcedExpDate', '');
-            $('#' + forcedExpDateProp).val('');
+            OC.AppConfig.setValue(this.appName, 'cookieExpTime', '');
+            $('#' + this.cookieExpTimeProp).val('');
+            OC.AppConfig.setValue(this.appName, 'cookieExpTimeIntv', '');
+            $('#' + this.cookieExpTimeIntvProp).val('');
+            OC.AppConfig.setValue(this.appName, 'forcedExpDate', '');
+            $('#' + this.forcedExpDateProp).val('');
         }
-    }
-
-    /**
-     * Catches the 'change' event when changing the status of the
-     * <appName>useCookie checkbox.
-     *
-     * @remarks: Note that if this setting is unchecked, the controls:
-     *           <appName>cookieExpTime, <appName>cookieExpTimeIntv and
-     *           <appName>forcedExpDate will be disabled; otherwise they will be
-     *           enabled
-     */
-    enableDisableCookieInputs();
-    $('#' + useCookieProp).on('change', function() {
-        enableDisableCookieInputs();
-        var propValue = $(this).attr('checked') ? true : false;
-        OC.AppConfig.setValue(appName, 'useCookie', propValue);
-    });
-
-    /**
-     * Only allows digits for the '<appName>cookieExpTime' input
-     */
-    $('#' + cookieExpTimeProp).keydown(onlyDigits);
-
-    /**
-     * Catches the 'change' event of the '<appName>cookieExpTime' input
-     */
-    $('#' + cookieExpTimeProp).on('change', function(){
-        var propValue = $(this).val(); 
-        OC.AppConfig.setValue(appName, 'cookieExpTime', propValue);
-    });
-
-    /**
-     * Catches the 'change' event of the '<appName>cookieExpTimeIntv' select
-     */
-    $('#' + cookieExpTimeIntvProp).on('change', function(){
-        var propValue = $(this).val(); 
-        OC.AppConfig.setValue(appName, 'cookieExpTimeIntv', propValue);
-        if (propValue === '') {
-            OC.AppConfig.setValue(appName, 'cookieExpTime', '');
-            $('#' + cookieExpTimeProp).val('');
-            $('#' + cookieExpTimeProp).attr('disabled', true);
-        } else {
-            $('#' + cookieExpTimeProp).removeAttr('disabled');
-        }
-    });
-    if ($('#' + cookieExpTimeIntvProp).val() === '') {
-        $('#' + cookieExpTimeProp).attr('disabled', true);
-    }
-
-    /**
-     * Setups the specified datepicker to have:
-     * - The locale corresponding to the user's language
-     * - The month select list
-     * - The year select list
-     * - The 'today' and 'done' buttons (button panel)
-     * - The input text disabled so that the user isn't able to enter an invalid
-     *   date; only the backspace and delete keys will be active and they will
-     *   delete the whole text input
-     * - Respond to the 'change' method and save the date to the app settings
-     *
-     * @param string id          Id of the date picker to setup
-     * @param string userLang    Current user language
-     */
-    function configDatepicker(id, userLang) {
-        var propValue = $('#' + id).val();
-
-        $('#' + id).datepicker({
-            changeMonth: true,
-            changeYear: true,
-            showButtonPanel: true,
-            minDate: new Date(2015, 0, 1),
-            maxDate: new Date(), 
-            onClose: function(selectedDate) {
-                var propValue = $(this).val();
-                var propName = $(this).attr('id').split(appName)[1];
-                //Do not change the date format here. It is the one using to
-                //storing dates
-                var convertedDate = convertDate(propValue,
-                        datepickerUserFormat, datepickerAppFormat);
-                OC.AppConfig.setValue(appName, propName, convertedDate);
-            }
-        });
-
-        //Changes the jquery datepicker locale
-        $('#' + id).datepicker('option',
-            $.datepicker.regional[userLang]
-        );
-
-        /** 
-          * Disables all keys on the datepicker input texts in order to prevent
-          * that the user enters an invalid key. Only the 'Backspace' and
-          * 'Delete' keys are allowed; when pressed, the whole input text will
-          * be deleted
-          */
-        $('#' + id).keydown(function (e) {
-            // Allow the Windows and MAC key, Alt
-            if ((e.metaKey === true) || (e.altKey === true) ||
-            // Allow: F1 till F12 
-                (e.keyCode >= 112 && e.keyCode <= 123)) {
-                return;
-            }
-
-            if ($.inArray(e.keyCode, [46, 8]) !== -1) {
-                var propName = $(this).attr('id').split(appName)[1];
-                $(this).val('');
-                OC.AppConfig.setValue(appName, propName, '');
-            }
-            e.preventDefault();
-            return;
-        });
-        $('#' + id).val(propValue);
-    }
-
-    configDatepicker(forcedExpDateProp, userLang);
-
-    /**
-     * Catches the 'change' event when changing the status of the
-     * <appName>txtFile checkbox.
-     */
-    $('#' + txtFileProp).on('change', function() {
-        forceTxtOrPdf($(this), $('#' + pdfFileProp));
-    });
-
-    /**
-     * Enables/Disables the '<appName>maxAdminTxtSize' text field on load
-     * acording to the value of the <appName>txtFile setting
-     */
-    var isTxtFilePropChecked = $('#' + txtFileProp).attr('checked') ? true :
-        false;
-    if (!isTxtFilePropChecked) {
-        $('#' + maxAdminTxtSizeProp).attr('disabled', true);
-    }
-
-    /**
-     * Catches the 'change' event when changing the status of the
-     * <appName>pdfFile checkbox.
-     */
-    $('#' + pdfFileProp).on('change', function(){
-        forceTxtOrPdf($(this), $('#' + txtFileProp));
-    });
+    };
 
     /**
      * Forces that at least one of the entered checkboxes is set
@@ -217,37 +95,17 @@ $(document).ready(function() {
      * @param string control1   Control were the 'change' event was triggered
      * @param string control2   Second control that will be validated
      */
-    function forceTxtOrPdf(control1, control2) {
+    Config.prototype.forceTxtOrPdf = function(control1, control2) {
         var propValue1 = control1.attr('checked') ? true : false;
         var propValue2 = control2.attr('checked') ? true : false;
         if ( !propValue1 && !propValue2 ) {
-            $('#' + appName + 'errorDialog').dialog('open');
+            $('#' + this.appName + 'errorDialog').dialog('open');
             propValue1 = true;
             control1.attr('checked', true);
         }
-        var propName = control1.attr('id').split(appName)[1];
-        OC.AppConfig.setValue(appName, propName, propValue1);
-    }
-
-    /**
-     * Shows the contents of the txt file and a link to the pdf for the selected
-     * language. If the text file doesn't exist, then an error message will be
-     * displayed on the textarea that is supposed to show its contents. For the
-     * pdfs, an error will be displayed instead of a link.
-     */
-    $('#' + defaultLangProp).on('change', function(){
-        var propValue = $(this).val();
-        OC.AppConfig.setValue(appName, 'defaultLang', propValue);
-        reloadFileInfo(propValue);
-    });
-
-    /**
-     * Changes the disclaimerLayout applicatin settings
-     */
-    $('#' + disclaimerLayoutProp).on('change', function(){
-        var propValue = $(this).val();
-        OC.AppConfig.setValue(appName, 'disclaimerLayout', propValue);
-    });
+        var propName = control1.attr('id').split(this.appName)[1];
+        OC.AppConfig.setValue(this.appName, propName, propValue1);
+    };
 
     /**
      * Reloads the txt file contents and the pdf link according to the entered
@@ -255,10 +113,17 @@ $(document).ready(function() {
      *
      * @param string currentLang    The current language
      */
-    function reloadFileInfo(currentLang)
-    {
-        var baseUrl = OC.generateUrl('/apps/' + appName +
+    Config.prototype.reloadFileInfo = function(currentLang) {
+        var baseUrl = OC.generateUrl('/apps/' + this.appName +
                 '/settings/get_files');
+
+        //Quick hack to be able to access the 'this' object properties. You can
+        //also achieve this by setting the context setting from ajax to 'this',
+        //then you can just write "this.prop"; however, if you want to access
+        //the ajax object itself, you won't be able to because 'this' won't
+        //reffer to it anymore
+        var obj = this;
+
         $.ajax({
             url: baseUrl,
             type: 'GET',
@@ -269,90 +134,168 @@ $(document).ready(function() {
             contentType: 'application/json; charset=utf-8',
             success: function(files) {
                 if (files['txtFileData']['error'] === '') {
-                    $('#' + txtFileContentsProp).text(
+                    $('#' + obj.txtFileContentsProp).text(
                         files['txtFileData']['contents']
                      );
                 } else {
-                    $('#' + txtFileContentsProp).text(
+                    $('#' + obj.txtFileContentsProp).text(
                         files['txtFileData']['error']
                      );
                 }
-                $('#' + txtFilePathProp).text(files['txtFileData']['path']);
+                $('#' + obj.txtFilePathProp).text(files['txtFileData']['path']);
 
                 if (files['pdfFileData']['error'] === '') {
                     var pdfLink = files['pdfFileData']['url'];
                     pdfLink = '<a href="' + pdfLink + '" target="_blank">' +
                         files['pdfFileData']['name'] +'</a>';
-                    $('#' + pdfFileUrlProp).html(pdfLink);
+                    $('#' + obj.pdfFileUrlProp).html(pdfLink);
                 } else {
-                    $('#' + pdfFileUrlProp).text(files['pdfFileData']['error']);
+                    $('#' + obj.pdfFileUrlProp).text(
+                        files['pdfFileData']['error']);
                 }
             }
         });
+    };
+
+    exports.Config = Config;
+})(window, jQuery, AgreeDisclaimer);
+
+$(document).ready(function() {
+    /** Fix it: It would be nice to adquire the app's name from somewhere */
+    var appName = 'agreedisclaimer';
+    var userLang = OC.getLocale().substr(0,2);
+    var datepickerAppFormat = $('#' + appName + 'datepickerAppFormat').val();
+
+    var utils = new AgreeDisclaimer.Utils();
+    var datepickerUtils = new AgreeDisclaimer.DatepickerUtils(appName, userLang,
+                              monthNames, dayNames,
+                              datepickerAppFormat, utils);
+
+    var config = new AgreeDisclaimer.Config('agreedisclaimer', userLang, utils,
+                     datepickerUtils); 
+    config.init();
+
+    /** jquery events */
+
+    /**
+     * Catches the 'change' event of the '<appName>disclaimerType' select
+     */
+    $('#' + config.disclaimerTypeProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'disclaimerType', propValue);
+    });
+
+    /**
+     * Catches the 'change' event when changing the status of the
+     * <appName>useCookie checkbox.
+     *
+     * @remarks: Note that if this setting is unchecked, the controls:
+     *           <appName>cookieExpTime, <appName>cookieExpTimeIntv and
+     *           <appName>forcedExpDate will be disabled; otherwise they will be
+     *           enabled
+     */
+    $('#' + config.useCookieProp).on('change', function() {
+        config.enableDisableCookieInputs();
+        var propValue = $(this).attr('checked') ? true : false;
+        OC.AppConfig.setValue(appName, 'useCookie', propValue);
+    });
+
+    /**
+     * Only allows digits for the '<appName>cookieExpTime' input
+     */
+    $('#' + config.cookieExpTimeProp).keydown(utils.onlyDigits);
+
+    /**
+     * Catches the 'change' event of the '<appName>cookieExpTime' input
+     */
+    $('#' + config.cookieExpTimeProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'cookieExpTime', propValue);
+    });
+
+    /**
+     * Catches the 'change' event of the '<appName>cookieExpTimeIntv' select
+     */
+    $('#' + config.cookieExpTimeIntvProp).on('change', function(){
+        var propValue = $(this).val(); 
+        OC.AppConfig.setValue(appName, 'cookieExpTimeIntv', propValue);
+        if (propValue === '') {
+            OC.AppConfig.setValue(appName, 'cookieExpTime', '');
+            $('#' + config.cookieExpTimeProp).val('');
+            $('#' + config.cookieExpTimeProp).attr('disabled', true);
+        } else {
+            $('#' + config.cookieExpTimeProp).removeAttr('disabled');
+        }
+    });
+
+    /**
+     * Enables/Disables the '<appName>maxAdminTxtSize' text field on load
+     * acording to the value of the <appName>txtFile setting
+     */
+    var isTxtFilePropChecked = $('#' + config.txtFileProp).attr('checked') ?
+        true : false;
+    if (!isTxtFilePropChecked) {
+        $('#' + config.maxAdminTxtSizeProp).attr('disabled', true);
     }
 
     /**
      * Catches the 'change' event of the '<appName>maxAdminTxtSize' input in
      * order to warranted that it has to be lower than maxAppTxtFileSize
      */
-    $('#' + maxAdminTxtSizeProp).on('change', function(){
-        var propValue = $(this).val(); 
+    $('#' + config.maxAdminTxtSizeProp).on('change', function(){
+        var propValue = $(this).val();
         propValue = parseInt(propValue);
-        if (propValue > maxAppTxtSize) {
-            propValue = maxAppTxtSize;
-            $(this).val(maxAppTxtSize);
+        if (propValue > config.maxAppTxtSize) {
+            propValue = config.maxAppTxtSize;
+            $(this).val(config.maxAppTxtSize);
         } else if ((propValue === 0) || isNaN(propValue)) {
             propValue = 1;
             $(this).val(1);
         }
-        OC.AppConfig.setValue(appName, 'maxAdminTxtSize', propValue);
-        reloadFileInfo($('#' + defaultLangProp).val());
+        OC.AppConfig.setValue(config.appName, 'maxAdminTxtSize', propValue);
+        config.reloadFileInfo($('#' + config.defaultLangProp).val());
     });
 
     /**
-     * Only allows digits for text inputs
-     *
-     * @remarks: This code was taken from (some modifications were done):
-     * - How to allow only numeric (0-9) in HTML inputbox using jQuery?
-     *   Answer by SpYk3HH
-     *   http://stackoverflow.com/questions/995183/how-to-allow-only-numeric-0-9-in-html-inputbox-using-jquery
+     * Catches the 'change' event when changing the status of the
+     * <appName>txtFile checkbox.
      */
-    function onlyDigits(e) {
-        if (
-            // Allow: backspace, delete, tab, escape, enter, and scroll-lock
-            ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 145]) !== -1) ||
-            // Allow the Windows and MAC key, Alt
-            (e.metaKey === true) || (e.altKey === true) ||
-            // Allow: F1 till F12 
-            (e.keyCode >= 112 && e.keyCode <= 123) || 
-            // Allow: home, end, left, right, down, up
-            (e.keyCode >= 35 && e.keyCode <= 40)) {
-            // let it happen, don't do anything
-            return;
-        }
+    $('#' + config.txtFileProp).on('change', function() {
+        config.forceTxtOrPdf($(this), $('#' + config.pdfFileProp));
+    });
 
-        if  ( e.ctrlKey === true )
-        {
-            // Prevents the usage of Ctrl+V. Here the user could paste something
-            // that isn't a number, so instead of doing an extra validation,
-            // this will be disabled.
-            if (e.keyCode == 86) {
-                e.preventDefault();
-            }
-            return;
-        }
+    /**
+     * Catches the 'change' event when changing the status of the
+     * <appName>pdfFile checkbox.
+     */
+    $('#' + config.pdfFileProp).on('change', function(){
+        config.forceTxtOrPdf($(this), $('#' + config.txtFileProp));
+    });
 
-        // Ensure that it is a number and stop the keypress
-        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57))
-         && (e.keyCode < 96 || e.keyCode > 105)) {
-            e.preventDefault();
-        }
-    }
+    /**
+     * Shows the contents of the txt file and a link to the pdf for the selected
+     * language. If the text file doesn't exist, then an error message will be
+     * displayed on the textarea that is supposed to show its contents. For the
+     * pdfs, an error will be displayed instead of a link.
+     */
+    $('#' + config.defaultLangProp).on('change', function(){
+        var propValue = $(this).val();
+        OC.AppConfig.setValue(appName, 'defaultLang', propValue);
+        config.reloadFileInfo(propValue);
+    });
+
+    /**
+     * Changes the disclaimerLayout applicatin settings
+     */
+    $('#' + config.disclaimerLayoutProp).on('change', function(){
+        var propValue = $(this).val();
+        OC.AppConfig.setValue(appName, 'disclaimerLayout', propValue);
+    });
 
     /**
      * Only allows digits for the '<appName>maxAdminFileSize' input
      */
-    $('#' + maxAdminTxtSizeProp).keydown(onlyDigits);
+    $('#' + config.maxAdminTxtSizeProp).keydown(utils.onlyDigits);
 
     //Hides the help texts during load
     $('.' + appName + '_help_content').hide();

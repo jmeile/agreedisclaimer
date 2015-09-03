@@ -35,14 +35,14 @@ $disclaimerLayoutProp = $_['appName'] . 'disclaimerLayout';
 script($_['appName'], 'utils');
 
 /**
+ * Adds the jquery datepicker locales
+ */
+script($_['appName'], 'datepicker_utils');
+
+/**
  * Adds the admin.js file to the settings page
  */
 script($_['appName'], 'admin');
-
-/**
- * Adds the jquery datepicker locales
- */
-script($_['appName'], 'datepicker_l10n');
 
 /**
  * Adds the style sheets file to the settings page
