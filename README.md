@@ -16,7 +16,8 @@ translation files and paste that template in the middle of them.
 
 I'm not a native English nor German speaker, so, I would appreciate if you
 correct my translations and send me some feedback. I would also appreciate if
-you translate it in your own language and send me the text by email.
+you translate it in your own language, please see:
+https://github.com/jmeile/agreedisclaimer/issues/13
 
 You can contact me through this form:
 
