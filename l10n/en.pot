@@ -4,10 +4,16 @@
     "%s is the language code for the respective disclaimer translation":
     "",
 
+    "Add":
+    "",
+
     "Agree":
     "", 
 
     "Agree disclaimer":
+    "",
+
+    "Agreement text":
     "",
 
     "Automatically expire cookies older than":
@@ -40,6 +46,9 @@
     "Default language for the text":
     "",
 
+    "Delete":
+    "",
+
     "Disclaimer of liability":
     "",
 
@@ -58,25 +67,22 @@
     "General Terms and conditions":
     "",
 
-    "I accept the %s1general terms and conditions%s2":
+    "GTC":
     "",
 
-    "I have read and understood the %s1disclaimer of liability%s2":
+    "Here you can add your own agreement type by specifying the following properties":
     "",
 
-    "I have read and understood the %s1legal disclaimer%s2":
+    "I accept the @s1general terms and conditions@s2":
     "",
 
-    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "I have read and understood the @s1disclaimer of liability@s2":
     "",
 
-    "I have read and understood the %s1GTCs%s2":
+    "I have read and understood the @s1GTCs@s2":
     "",
 
-    "I have read and understood the %s1legal disclaimer%s2":
-    "",
-
-    "It can be a two character code, ie: %s or a five character code, ie: %s":
+    "I have read and understood the @s1legal disclaimer@s2":
     "",
 
     "If the file for the user language doesn't exist, then the file for the default language will be used":
@@ -85,10 +91,20 @@
     "If the text file is bigger than this size, then its contents won't appear completely in the dialog, so, adjust the size till it is adequate to your needs":
     "",
 
+    "If true, it indicates that the user is a returning visitor, who already accepted the disclaimer":
+    "",
+
     "If you want to modify this limit, do it at your own risk by changing the value of the parameter: maxAppTxtFileSize inside the config.php file":
     "",
 
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
+    "",
+
+    "It can be a two character code, ie: %s or a five character code, ie: %s":
+    "",
+
+
+    "It will be used for the title of text dialogs":
     "",
 
     "Legal disclaimer":
@@ -103,6 +119,9 @@
     "Maximum file size in megabytes for the text file":
     "",
 
+    "Menu entry":
+    "",
+
     "Menu entry position":
     "",
 
@@ -112,7 +131,13 @@
     "mm/dd/yy":
     "",
 
+    "Name":
+    "",
+
     "Neither the file: %s nor: %s exist":
+    "",
+
+    "New":
     "",
 
     "Next":
@@ -121,13 +146,16 @@
     "None":
     "",
 
+    "Note":
+    "",
+
     "Ok":
     "",
 
     "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
     "",
 
-    "Please read and agree the disclaimer before proceeding":
+    "On the \"Selected\" column you can choose the agreement type to be used by your OwnCloud":
     "",
 
     "Please also note that there is a hard coded limit of: %s Megabytes; this limit was set in order to prevent setting higher values that will make ownCloud to crash":
@@ -136,7 +164,22 @@
     "Please contact the webmaster":
     "",
 
+    "Please make sure that the placeholders: \"@s1\" and \"@s2\" are present in the \"Agreement text\"":
+    "",
+
+    "Please note that the placeholders: @s1 and @s2 are necessary to indicate where the text link on the login page begins and ends respectively":
+    "",
+
+    "Please read and agree the disclaimer before proceeding":
+    "",
+
     "Prev":
+    "",
+
+    "Selected":
+    "",
+
+    "Short text, which will be used for the menu entry on the user pages":
     "",
 
     "Show a link to a PDF file with the disclaimer":
@@ -148,7 +191,28 @@
     "Show/Hide help":
     "",
 
+    "Text that will appear on the login dialog":
+    "",
+
+    "The default agreements: \"Disclaimer of liability\", \"Legal disclaimer\", and \"General Terms and conditions\" can't be deleted":
+    "",
+
+    "The fields: \"Name\" and \"Agreement text\" are obligatory":
+    "",
+
+    "The placeholder: \"@s1\" must be before \"@s2\"":
+    "",
+
+    "The placeholders: \"@s1\" and \"@s2\" can only appear once on the \"Agreement text\"":
+    "",
+
+    "The texts of the columns: \"Name\", \"Menu entry\", and \"Agreement text\" must be given in English, then you need to add the respective translations to files under the \"l10n\" folder":
+    "",
+
     "The value of the AGChecked will be set the first time that the user visits the website or when it has been expired":
+    "",
+
+    "This is the name of your own agreement":
     "",
 
     "This must be set in order to prevent the download of big text files, which may block the login page":
@@ -176,6 +240,9 @@
     "",
 
     "Wk":
+    "",
+
+    "With the \"delete\" button you can remove your own agreements":
     "",
 
     "Won't expire":

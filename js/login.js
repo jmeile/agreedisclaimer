@@ -60,9 +60,9 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
                 obj.showPdf = settings['pdfFileData']['value'];
                 obj.useCookie = settings['cookieData']['value']; 
                 obj.disclaimerText = t(obj.appName,
-                    settings['textData']['text']);
+                    settings['textData'][1]['text']);
                 obj.disclaimerTitle = t(obj.appName,
-                    settings['textData']['name']);
+                    settings['textData'][1]['name']);
                 if (obj.showTxt) {
                     if (settings['txtFileData']['error'] === '') {
                         //If there weren't any error, the file contents will be
@@ -112,20 +112,20 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
         var keywords;
         if (this.showTxt) {
             //If the link to the txt file is supposed to be shown, the
-            //placeholders: '%s1' and '%s2' will be used to render an html
+            //placeholders: '@s1' and '@s2' will be used to render an html
             //anchor (<a> html tag)
             keywords = {
-                '%s1': '<a id="' + this.appName + 'Link">',
-                '%s2': '</a>'
+                '@s1': '<a id="' + this.appName + 'Link">',
+                '@s2': '</a>'
             }
         } else {
             //Otherwise, they will be ignored
             keywords = {
-                '%s1': '',
-                '%s2': ''
+                '@s1': '',
+                '@s2': ''
             }
         }
-        this.disclaimerText = this.utils.multiple_replace(this.disclaimerText,
+        this.disclaimerText = this.utils.multipleReplace(this.disclaimerText,
                                   keywords); 
         
         var disclaimerDiv = $('<div />');

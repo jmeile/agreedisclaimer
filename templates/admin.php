@@ -129,22 +129,138 @@ style($_['appName'], 'admin');
     <label for="<?php p($disclaimerTypeProp); ?>">
         <?php p($l->t('Disclaimer type') . ':'); ?>
     </label>&nbsp;
-    <select name="<?php p($disclaimerTypeProp); ?>"
-            id="<?php p($disclaimerTypeProp); ?>">
+    <a id="<?php p($disclaimerTypeProp . 'Help'); ?>"
+               class="<?php p($_['appName'] . '_help_button'); ?> icon-info svg"
+               title="<?php p($l->t('Show/Hide help')); ?>"></a><br/>
+    <div class="<?php p($_['appName'] . '_help_content'); ?>"
+         id="<?php p($disclaimerTypeProp . 'HelpContent' ) ?>">
+         <?php p($l->t('Here you can add your own agreement type by ' .
+                       'specifying the following properties')); ?>:<br/>
+        <ul>
+            <li>
+                <b><?php p($l->t('Name')); ?>:</b> 
+                <?php p($l->t('This is the name of your own agreement')); ?>. 
+                <?php p($l->t('It will be used for the title of text dialogs'));
+                ?>.
+            </li>
+            <li>
+                <b><?php p($l->t('Menu entry')); ?>:</b> 
+                <?php p($l->t('Short text, which will be used for the menu ' .
+                              'entry on the user pages')); ?>.
+            </li>
+            <li>
+                <b><?php p($l->t('Agreement text')); ?>:</b>
+                <?php p($l->t('Text that will appear on the login dialog')); ?>.
+                <?php p($l->t('Please note that the placeholders: @s1 and ' .
+                              '@s2 are necessary to indicate where the text ' .
+                              'link on the login page begins and ends ' .
+                              'respectively')); ?>.
+            </li>
+        </ul><br/>
+        <b><?php p($l->t('Note')); ?>:</b>
+        <ul>
+            <li>
+                <?php p($l->t('The texts of the columns: "Name", "Menu ' .
+                              'entry", and "Agreement text" must be given in ' .
+                              'English, then you need to add the respective ' .
+                              'translations to files under the "l10n" ' .
+                              'folder')); ?>
+            </li>
+            <li>
+                <?php p($l->t('On the "Selected" column you can choose the ' .
+                              'agreement type to be used by your OwnCloud')); ?>
+                .
+            </li>
+            <li>
+                <?php p($l->t('With the "delete" button you can remove your ' .
+                              'own agreements')); ?>.
+                <?php p($l->t('The default agreements: "Disclaimer of ' .
+                              'liability", "Legal disclaimer", and "General ' .
+                              'Terms and conditions" can\'t be deleted')); ?>.
+            </li>
+        </ul><br/>
+    </div>
+
+    <input type="hidden" id="<?php p($_['appName']) ?>disclaimerTypes"
+           value="<?php p($_['disclaimerTypes']); ?>"/>
+    <table class="<?php p($_['appName']); ?>_types_table">
+        <tr>
+            <th width="1%"><?php p($l->t('Selected')); ?></th>
+            <th width="26%"><?php p($l->t('Name')); ?></th>
+            <th width="26%"><?php p($l->t('Menu entry')); ?></th>
+            <th width="46%"><?php p($l->t('Agreement text')); ?></th>
+            <th width="1%"><?php p($l->t('Delete')); ?></th>
+        </tr>
         <?php 
-            foreach($_['disclaimerTypes'] as $disclaimerValue
-                                          => $disclaimerType):
+            $disclaimerTypes = json_decode($_['disclaimerTypes'], true);
+            foreach($disclaimerTypes as $disclaimerValue
+                                          => $disclaimerData):
         ?>
-            <option value="<?php p($disclaimerValue); ?>" 
-                <?php
-                    if ($disclaimerValue == $_['textData']['value']) {
-                        p('selected');
-                    }
-                ?>>
-                <?php p($l->t($disclaimerType['name'])); ?>
-            </option>
+            <tr>
+                <td>
+                    <input type="radio"
+                           id="<?php p($disclaimerTypeProp . 'Radio' .
+                               $disclaimerValue); ?>"
+                           name="<?php p($disclaimerTypeProp); ?>"
+                           value="<?php p($disclaimerValue); ?>"
+                           <?php
+                                if ($disclaimerValue === $_['disclaimerType']) {
+                                    p('checked');
+                                }
+                           ?>/>
+                </td>
+                <td>
+                    <?php p($l->t($disclaimerData['name'])); ?>
+                </td>
+                <td>
+                    <?php p($l->t($disclaimerData['menu'])); ?>
+                </td>
+                <td>
+                    <?php p($l->t($disclaimerData['text'])); ?>
+                </td>
+                <td>
+                    <?php
+                        $allowDelete = !isset($disclaimerData['allowDelete']) ?
+                            true : $disclaimerData['allowDelete'];
+                        if ($allowDelete): 
+                    ?>
+                        <a id="<?php p($disclaimerTypeProp . 'Del_' .
+                            $disclaimerValue); ?>"
+                         class="icon-delete svg">
+                        </a>
+                    <?php endif; ?>
+                </td>
+            </tr>
         <?php endforeach; ?>
-    </select><br/>
+        <tr id="<?php p($_['appName']); ?>_add_row"
+            class="<?php p($_['appName']); ?>_add_row">
+            <td>
+                <br/><b><?php p($l->t('New')); ?>:</b>
+            </td>
+            <td>
+                <br/>
+                <b>*</b> <input id="<?php p($_['appName']); ?>disclaimerName"
+                       style="width:220px" type="text"/>
+            </td>
+            <td>
+                <br/>
+                <input id="<?php p($_['appName']); ?>disclaimerMenu"
+                       style="width:150px" type="text"/>
+            </td>
+            <td>
+                <br/>
+                <b>*</b> 
+                <input id="<?php p($_['appName']); ?>disclaimerAgreement"
+                       style="width:350px" type="text"/>
+            </td>
+            <td>
+                <br/>
+                <button id="<?php p($_['appName']); ?>disclaimerAdd">
+                    <?php p($l->t('Add')); ?>
+                </button>
+            </td>
+        </tr>
+    </table><br/>
     <input type="checkbox" id="<?php p($txtFileProp); ?>"
            name="<?php p($txtFileProp); ?>"
            <?php if ($_['txtFileData']['value']) p('checked'); ?>/>

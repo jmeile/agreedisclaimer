@@ -1,6 +1,25 @@
+#AgreeDisclaimer (1.0.1) - 07.09.2015
+##CHANGES
+* Implemented enhacement request:
+  - To be able to setup the disclaimer types outside of the code
+    https://github.com/jmeile/agreedisclaimer/issues/10
+* The disclaimer types are now stored as a json string
+* The current selected disclaimer type is no longer stored as a string. It is an
+  integer index reffering to the json disclaimer types
+* The menu entry will now be rendered with a shorter string. When howering over
+  it the longer string will be shown
+* The placeholders for the disclaimer texts: %s1 and %s2 were changed by @s1 and
+  @s2 because the 'p', 'print_unescaped', and 't' functions from OwnCloud have
+  problem with the '%' character
+* The function multiple_replace from the JavaScript Utils class was renamed to
+  multipleReplace
+* A new function: multipleSearch was added to the JavaScript Utils class. This
+  function searchs several the keywords in a string and return all their
+  positions
+
 #AgreeDisclaimer (1.0.0) - 03.09.2015
 ##CHANGES
-* Implemented enhacnement request:
+* Implemented enhacement request:
   - Change the whole JavaScript code to OO
     https://github.com/jmeile/agreedisclaimer/issues/9
 * Injecting html code by using strings was replaced by jquery objects

@@ -7,11 +7,17 @@ OC.L10N.register(
     "%s is the language code for the respective disclaimer translation":
     "%s es el código del idioma de la respectiva traducción",
 
+    "Add":
+    "Agregar",
+
     "Agree":
     "Aceptar",
 
     "Agree disclaimer":
     "Exclusión de responsabilidad",
+
+    "Agreement text":
+    "Texto del contrato",
 
     "Automatically expire cookies older than":
     "Expirar automáticamente cookies anteriores a",
@@ -46,6 +52,9 @@ OC.L10N.register(
     "Default language for the text":
     "Idioma por defecto para el texto",
 
+    "Delete":
+    "Borrar",
+
     "Disclaimer of liability":
     "Exclusión de responsabilidad",
 
@@ -64,17 +73,20 @@ OC.L10N.register(
     "General Terms and conditions":
     "Términos y condiciones generales de uso",
 
-    "I accept the %s1general terms and conditions%s2":
-    "Acepto los %s1términos generales de uso%s2",
+    "GTC":
+    "TCU",
 
-    "I have read and understood the %s1disclaimer of liability%s2":
-    "He leído y entendido la %s1exclusión de responsabilidad%s2",
+    "Here you can add your own agreement type by specifying the following properties":
+    "Aqui usted puede agregar su propio acuerdo especificando las siguientes propiedades",
 
-    "I have read and understood the %s1legal disclaimer%s2":
-    "He leído y entendido el %s1aviso legal%s2",
+    "I accept the @s1general terms and conditions@s2":
+    "Acepto los @s1términos generales de uso@s2",
 
-    "It can be a two character code, ie: %s or a five character code, ie: %s":
-    "Puede ser un código de dos caracteres, ej: %s o de 5 caracteres, ej: %s",
+    "I have read and understood the @s1disclaimer of liability@s2":
+    "He leído y entendido la @s1exclusión de responsabilidad@s2",
+
+    "I have read and understood the @s1legal disclaimer@s2":
+    "He leído y entendido el @s1aviso legal@s2",
 
     "If the file for the user language doesn't exist, then the file for the default language will be used":
     "Si el archivo para el idioma del usuario no existe, el archivo del idioma por defecto será usado",
@@ -91,6 +103,12 @@ OC.L10N.register(
     "In case that the file for the default language doesn't exist, then the user will see an error message when trying to read the text":
     "En caso de que el archivo para el idioma por defecto no exista, el usuario verá un error al intentar leer el texto",
 
+    "It can be a two character code, ie: %s or a five character code, ie: %s":
+    "Puede ser un código de dos caracteres, ej: %s o de 5 caracteres, ej: %s",
+
+    "It will be used for the title of text dialogs":
+    "Será usado para el título de los diálogos de texto",
+
     "Legal disclaimer":
     "Aviso legal",
 
@@ -103,6 +121,9 @@ OC.L10N.register(
     "Maximum file size in megabytes for the text file":
     "Tamaño máximo del archivo de texto en megabytes",
 
+    "Menu entry":
+    "Texto del menú",
+
     "Menu entry position":
     "Posición en el menú",
 
@@ -112,14 +133,23 @@ OC.L10N.register(
     "Months":
     "Meses",
 
+    "Name":
+    "Nombre",
+
     "Neither the file: %s nor: %s exist":
     "Ni el achivo: %s o: %s existen",
 
     "Next":
     "Sig",
 
+    "New":
+    "Nuevo",
+
     "None":
     "No mostrar",
+
+    "Note":
+    "Nota",
 
     "Ok":
     "Aceptar",
@@ -127,8 +157,8 @@ OC.L10N.register(
     "On the contrary, if it is a returning user, who already accepted the disclaimer and there is an expiration time for old cookies, then the age of the AGChecked cookie will be determined by getting the AGLastVisit cookie; if it is higher than the expiration date for old cookies, then it will be invalidated":
     "Por el contrario, si el usuario ya ha visitado el sitio, ha aceptado la exclusión de responsabilidad y hay una fecha de expiración para cookies anteriores, la antigüedad de AGChecked será calculada obteniendo AGLastVisit; si ésta es mayor que dicha fecha de expiración, ésta será invalidada",
 
-    "Please read and agree the disclaimer before proceeding":
-    "Por favor lea y acepte la exclusión de responsabilidad antes de proceder",
+    "On the \"Selected\" column you can choose the agreement type to be used by your OwnCloud":
+    "En la columna: \"Seleccionado\", podrá escoger el tipo de acuerdo usado por su OwnCloud",
 
     "Please also note that there is a hard coded limit of: %s Megabytes; this limit was set in order to prevent setting higher values that will make ownCloud to crash":
     "Por favor tenga presente que hay un límite máximo de: %s Megabytes; este valor fue asignado para evitar que ownCloud se bloquee al intentar ingresar valores superiores",
@@ -136,8 +166,23 @@ OC.L10N.register(
     "Please contact the webmaster":
     "Por favor contacte el administrador de la página web",
 
+    "Please make sure that the placeholders: \"@s1\" and \"@s2\" are present in the \"Agreement text\"":
+    "Por favor asegúrese de que los delimitadores: \"@s1\" y \"@s2\" estén presentes en \"Texto del contrato\"",
+
+    "Please note that the placeholders: @s1 and @s2 are necessary to indicate where the text link on the login page begins and ends respectively":
+    "Por favor note que los delimitadores: @s1 y @s2 son necesarios para indicar donde comienza y termina el enlace mostrado en dicha página",
+
+    "Please read and agree the disclaimer before proceeding":
+    "Por favor lea y acepte la exclusión de responsabilidad antes de proceder",
+
     "Prev":
     "Ant",
+
+    "Selected":
+    "Seleccionado",
+
+    "Short text, which will be used for the menu entry on the user pages":
+    "Texto corto que será usado para el menú en las páginas de usuario",
 
     "Show a link to a PDF file with the disclaimer":
     "Mostrar un enlace a un archivo PDF",
@@ -148,8 +193,29 @@ OC.L10N.register(
     "Show/Hide help":
     "Mostrar/Ocultar ayuda",
 
+    "Text that will appear on the login dialog":
+    "Texto que aparecerá en la página de registro",
+
+    "The default agreements: \"Disclaimer of liability\", \"Legal disclaimer\", and \"General Terms and conditions\" can't be deleted":
+    "Los acuerdos por defecto: \"exclusión de responsabilidad\", \"aviso legal\" y \"términos y condiciones generales de uso\" no pueden ser eliminados",
+
+    "The fields: \"Name\" and \"Agreement text\" are obligatory":
+    "Los campos \"Nombre\" y \"Texto del contrato\" son obligatorios",
+
+    "The placeholder: \"@s1\" must be before \"@s2\"":
+    "El delimitador: \"@s1\" debe estar antes que \"@s2\"",
+
+    "The placeholders: \"@s1\" and \"@s2\" can only appear once on the \"Agreement text\"":
+    "Los delimitadores \"@s1\" y \"@s2\" pueden aparecer sólo una vez en \"Texto del contrato\"",
+
+    "The texts of the columns: \"Name\", \"Menu entry\", and \"Agreement text\" must be given in English, then you need to add the respective translations to files under the \"l10n\" folder":
+    "Los textos de las columnas: \"Nombre\", \"Texto del menú\" y \"Texto del contrato\" deberán ser ingresados en inglés; luego usted deberá agregar las traducciones respectivas a los archivos dentro de la carpeta \"l10n\"",
+
     "The value of the AGChecked will be set the first time that the user visits the website or when it has been expired":
     "El valor de AGChecked será asignado la primera vez que el usuario visita el sitio o cuando ésta haya expirado",
+
+    "This is the name of your own agreement":
+    "Éste es el nombre de su acuerdo",
 
     "This must be set in order to prevent the download of big text files, which may block the login page":
     "Este valor debe ser ingresado para prevenir que la carga de archivos de texto grandes bloqueen la página de registro",
@@ -174,6 +240,9 @@ OC.L10N.register(
 
     "Where":
     "Donde",
+
+    "With the \"delete\" button you can remove your own agreements":
+    "Con el botón \"borrar\", usted puede eliminar sus propios acuerdos",
 
     "Wk":
     "Sm",

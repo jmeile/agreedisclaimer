@@ -28,13 +28,16 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
      * find multiple key words within a dictionary Javascript, answer by Rob W
      * http://stackoverflow.com/questions/8413651/find-multiple-key-words-within-a-dictionary-javascript
      *
-     * @param string str    String where the replacements are going to be done
+     * @param string str        String where the replacements are going to be
+     *                          done
      * @param object keywors    Keywords and its replacements, ie:
      *                          {"blue": "red", "yellow": "orange} will replace
      *                          all the occurences from "blue" by "red" and from
      *                          "yellow" by "orange"
+     *
+     * @return string   The string with the replaced keywords
      */
-    Utils.prototype.multiple_replace = function(str, keywords) { 
+    Utils.prototype.multipleReplace = function(str, keywords) { 
         var pattern = [];
         var key;
         var result;
@@ -54,6 +57,54 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
                  });
         return result;
     };
+
+    /**
+     * Searchs all the keywords in the entered string and return all their
+     * indexes
+     *
+     * This code was inspired on: 
+     * - find multiple key words within a dictionary Javascript, answer by Rob W
+     *   http://stackoverflow.com/questions/8413651/find-multiple-key-words-within-a-dictionary-javascript
+     * - Javascript str.search() multiple instances, answer by nrabinowitz
+     *   http://stackoverflow.com/questions/6825492/javascript-str-search-multiple-instances
+     *
+     * @param string str        String where the multiple search is going to be
+     *                          executed
+     * @param object keywors    Keywords array, ie: ["blue", "red"] 
+     *
+     * @return object   A dictionary with the keywords and the indexes where
+     *                  they were found, ie:
+     *                  {
+     *                      "red": [0, 10],
+     *                      "blue: [4, 14, 22]
+     *                  }
+     *                  This means that "red" was found on the entered string on
+     *                  the indexes 0 and 10, while "blue" was found on the
+     *                  indexes 4, 14, and 22.
+     */
+    Utils.prototype.multipleSearch = function(str, keywords) {
+        var pattern = [];
+        var key;
+        var indexes = {};
+        var index;
+        var match;
+
+        for (index in keywords) {
+            key = keywords[index];
+            indexes[key] = [];
+
+            // Sanitize the key, and push it in the list
+            pattern.push(key.replace(/([[^$.|?*+(){}])/g, '\\$1'));
+        }
+
+        pattern = "(?:" + pattern.join(")|(?:") + ")"; //Create pattern
+        pattern = new RegExp(pattern, "g");
+
+        while (match = pattern.exec(str)) {
+            indexes[match[0]].push(match.index);
+        }
+        return indexes;
+    }
 
     /**
      * Checks if the entered string is a valid date of the format dd/mm/yyyy

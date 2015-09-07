@@ -53,6 +53,7 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
         this.cookieExpTimeIntvProp = this.cookieExpTimeProp + 'Intv';
         this.forcedExpDateProp = this.appName + 'forcedExpDate';
         this.disclaimerTypeProp = this.appName + 'disclaimerType';
+        this.disclaimerTypesProp = this.appName + 'disclaimerTypes';
         this.disclaimerLayoutProp = this.appName + 'disclaimerLayout';
 
         this.datepickerUtils.initDatePickerLocale();
@@ -90,6 +91,19 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
     };
 
     /**
+     * Shows a message on a jquery dialog 
+     *
+     * @param string message    Message to display
+     */
+    Config.prototype.showMessage = function(message) {
+            var messageDialog = $('#' + this.appName + 'errorDialog');
+            var messageText = $('<p />');
+            messageText.text(t(this.appName, message));
+            messageDialog.html(messageText);
+            messageDialog.dialog('open');
+    }
+
+    /**
      * Forces that at least one of the entered checkboxes is set
      *
      * @param string control1   Control were the 'change' event was triggered
@@ -99,7 +113,7 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
         var propValue1 = control1.attr('checked') ? true : false;
         var propValue2 = control2.attr('checked') ? true : false;
         if ( !propValue1 && !propValue2 ) {
-            $('#' + this.appName + 'errorDialog').dialog('open');
+            this.showMessage('You must check at least one option!');
             propValue1 = true;
             control1.attr('checked', true);
         }
@@ -157,6 +171,182 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
         });
     };
 
+    /**
+     * Validates the entered fields for the new disclaimer type
+     *
+     * @param string disclaimerName         Name of the new disclaimer
+     * @param string disclaimerMenu         Text for the menu
+     * @param string disclaimerAgreement    Text of the disclaimer
+     *
+     * @return bool    If all validations are passed, then true will be
+     *      returned; otherwise, false will be returned.
+     */
+    Config.prototype.validateFields = function(disclaimerName, disclaimerMenu,
+        disclaimerAgreement) {
+        if ((disclaimerName === '') || (disclaimerAgreement === ''))
+        {
+            this.showMessage('The fields: "Name" and "Agreement text" ' +
+                             'are obligatory');
+            return false;
+        }
+        var placeholderPos = this.utils.multipleSearch(disclaimerAgreement,
+            ['@s1', '@s2']);
+
+        var numS1 = placeholderPos['@s1'].length;
+        var numS2 = placeholderPos['@s2'].length;
+        if ((numS1 === 0) || (numS2 === 0)) {
+            this.showMessage('Please make sure that the placeholders: ' +
+                '"@s1" and "@s2" are present in the "Agreement text"');
+            return false;
+        }
+        if ((numS1 >= 2) || (numS2 >= 2)) {
+            this.showMessage('The placeholders: "@s1" and "@s2" can ' +
+                'only appear once on the "Agreement text"');
+            return false;
+        }
+        if (placeholderPos['@s1'][0] > placeholderPos['@s2'][0]) {
+            this.showMessage('The placeholder: "@s1" must be before ' +
+                '"@s2"');
+            return false;
+        }
+        return true;
+    };
+
+    /**
+     * Injects a new disclaimer type added by the admin user to the html table
+     * were the other disclaimers are displayed 
+     *
+     * @param string disclaimerName         Name of the new disclaimer
+     * @param string disclaimerMenu         Text for the menu
+     * @param string disclaimerAgreement    Text of the disclaimer
+     * @param int    lastDisclaimer         Index of the added disclaimer
+     */
+    Config.prototype.injectDisclaimer = function(disclaimerName, disclaimerMenu,
+        disclaimerAgreement, lastDisclaimer) {
+        var row = $('<tr />');
+        var cell = $('<td />');
+
+        var radioButton = $('<input />');
+        radioButton.attr('id', this.disclaimerTypeProp + 'Radio' +
+            lastDisclaimer);
+        radioButton.attr('type', 'radio');
+        radioButton.attr('name', this.disclaimerTypeProp); 
+        radioButton.attr('value', lastDisclaimer);
+
+        //Quick hack to be able to access the 'this' object properties
+        //inside the jquery event handlers.
+        var config = this;
+        radioButton.on('change', function(){
+            var propValue = $(this).val();
+            OC.AppConfig.setValue(config.appName, 'disclaimerType', propValue);
+        });
+        cell.append(radioButton);
+        row.append(cell);
+
+        cell = $('<td />');
+        cell.text(t(this.appName, disclaimerName));
+        row.append(cell);
+
+        cell = $('<td />');
+        cell.text(t(this.appName, disclaimerMenu));
+        row.append(cell);
+
+        cell = $('<td />');
+        cell.text(t(this.appName, disclaimerAgreement));
+        row.append(cell);
+
+        cell = $('<td />');
+        var deleteButton = $('<a />');
+        deleteButton.attr('id', this.disclaimerTypeProp + 'Del_' +
+            lastDisclaimer);
+        deleteButton.attr('class', 'icon-delete svg');
+        deleteButton.click(function(event) {
+            var idParts = $(this).attr('id').split('Del_');
+            config.deleteDisclaimer(parseInt(idParts[1]));
+        });
+        cell.append(deleteButton);
+        row.append(cell);
+
+        $('#' + this.appName + '_add_row').before(row);
+    };
+
+    /**
+     * Adds a new disclaimer to the application settings
+     *
+     * @param string disclaimerName         Name of the new disclaimer
+     * @param string disclaimerMenu         Text for the menu
+     * @param string disclaimerAgreement    Text of the disclaimer
+     */
+    Config.prototype.addDisclaimer = function(disclaimerName, disclaimerMenu,
+        disclaimerAgreement) {
+        if (!this.validateFields(disclaimerName, disclaimerMenu,
+            disclaimerAgreement)) {
+            return;
+        }
+
+        if (disclaimerMenu === '') {
+            disclaimerMenu = disclaimerName;
+        }
+
+        var disclaimerTypesStr = $('#' + this.disclaimerTypesProp).val();
+        var disclaimerTypes = $.parseJSON(disclaimerTypesStr);
+        var disclaimerEntry = {
+            "name": disclaimerName,
+            "menu": disclaimerMenu,
+            "text": disclaimerAgreement
+        };
+        disclaimerTypes.push(disclaimerEntry);
+        disclaimerTypesStr = JSON.stringify(disclaimerTypes);
+        OC.AppConfig.setValue(this.appName, 'disclaimerTypes',
+            disclaimerTypesStr);
+        $('#' + this.disclaimerTypesProp).val(disclaimerTypesStr);
+
+        $('#' + this.appName + 'disclaimerName').val('');
+        $('#' + this.appName + 'disclaimerMenu').val('');
+        $('#' + this.appName + 'disclaimerAgreement').val('');
+        this.injectDisclaimer(disclaimerName, disclaimerMenu,
+            disclaimerAgreement, disclaimerTypes.length - 1);
+    };
+
+    /**
+     * Deletes a disclaimer from the application settings
+     *
+     * @param int disclaimerIndex    Index of the disclaimer to delete 
+     */
+    Config.prototype.deleteDisclaimer = function(disclaimerIndex) {
+        var i;
+        var row;
+        var radio;
+
+        var disclaimerTypesStr = $('#' + this.disclaimerTypesProp).val();
+        var disclaimerTypes = $.parseJSON(disclaimerTypesStr);
+
+        var currentDisclaimer = parseInt($('input[name=' +
+            this.disclaimerTypeProp + ']:checked').val());
+        radio = $('#' + this.disclaimerTypeProp + 'Radio' + disclaimerIndex);
+        row = radio.closest('tr');
+        row.remove();
+        for (i = disclaimerIndex + 1; i < disclaimerTypes.length; i++) {
+            radio = $('#' + this.disclaimerTypeProp + 'Radio' + i.toString());
+            radio.val(i - 1);
+            radio.attr('id', this.disclaimerTypeProp + 'Radio' +
+                (i - 1).toString());
+        }
+        if (currentDisclaimer >= disclaimerIndex) {
+            currentDisclaimer = currentDisclaimer - 1;
+            radio = $('#' + this.disclaimerTypeProp + 'Radio' + 
+                currentDisclaimer.toString());
+            radio.attr('checked', true);
+            OC.AppConfig.setValue(this.appName, 'disclaimerType',
+                currentDisclaimer);
+        }
+        disclaimerTypes.splice(disclaimerIndex, 1);
+        disclaimerTypesStr = JSON.stringify(disclaimerTypes);
+        OC.AppConfig.setValue(this.appName, 'disclaimerTypes',
+            disclaimerTypesStr);
+        $('#' + this.disclaimerTypesProp).val(disclaimerTypesStr);
+    };
+
     exports.Config = Config;
 })(window, jQuery, AgreeDisclaimer);
 
@@ -178,10 +368,10 @@ $(document).ready(function() {
     /** jquery events */
 
     /**
-     * Catches the 'change' event of the '<appName>disclaimerType' select
+     * Catches the 'change' event of the '<appName>disclaimerType' radio button 
      */
-    $('#' + config.disclaimerTypeProp).on('change', function(){
-        var propValue = $(this).val(); 
+    $("[name='" + config.disclaimerTypeProp + "']").on('change', function(){
+        var propValue = $(this).val();
         OC.AppConfig.setValue(appName, 'disclaimerType', propValue);
     });
 
@@ -286,6 +476,35 @@ $(document).ready(function() {
 
     /**
      * Changes the disclaimerLayout applicatin settings
+     */
+    $('#' + config.disclaimerLayoutProp).on('change', function(){
+        var propValue = $(this).val();
+        OC.AppConfig.setValue(appName, 'disclaimerLayout', propValue);
+    });
+
+    /**
+     * Handles the click event of the add disclaimer button
+     */
+    $('#' + config.appName + 'disclaimerAdd').click(function(event) {
+        var disclaimerName = $('#' + config.appName + 'disclaimerName').val();
+        var disclaimerMenu = $('#' + config.appName + 'disclaimerMenu').val();
+        var disclaimerAgreement =
+            $('#' + config.appName + 'disclaimerAgreement').val();
+        config.addDisclaimer(disclaimerName, disclaimerMenu,
+            disclaimerAgreement);
+        event.preventDefault();
+    });
+
+    /**
+     * Handles the click event on the delete disclaimer button
+     */
+    $('[id*="' + config.disclaimerTypeProp + 'Del"]').click(function(event) {
+        var idParts = $(this).attr('id').split('Del_');
+        config.deleteDisclaimer(parseInt(idParts[1]));
+    });
+
+    /**
+     * Changes the disclaimerLayout application settings
      */
     $('#' + config.disclaimerLayoutProp).on('change', function(){
         var propValue = $(this).val();

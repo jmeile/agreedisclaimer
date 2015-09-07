@@ -49,3 +49,69 @@
     text-decoration: underline;
 }
 
+/**
+ * Table for rendering the disclaimer types
+ */
+.agreedisclaimer_types_table {
+    width:100%;
+}
+
+/**
+ * Table borders
+ */
+.agreedisclaimer_types_table,
+.agreedisclaimer_types_table th,
+.agreedisclaimer_types_table td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+/**
+ * Cell properties
+ */
+.agreedisclaimer_types_table td {
+    padding: 5px;
+    text-align: left;
+}
+
+/**
+ * Layout for the even rows
+ */
+.agreedisclaimer_types_table tr:nth-child(even) {
+    background-color: #E8E8E8;
+}
+
+/**
+ * Layout for the odd rows
+ */
+.agreedisclaimer_types_table tr:nth-child(odd) {
+   background-color:#fff;
+}
+
+/**
+ * Layout for the heading 
+ */
+.agreedisclaimer_types_table th {
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+    background-color: #aaa;
+    color: white;
+    font-weight: bold;
+}
+
+/**
+ * Delete icon link
+ */
+#agreedisclaimer a.icon-delete {
+    display: block;
+}
+
+/**
+ * Row to add new disclaimers
+ */
+tr.agreedisclaimer_add_row td {
+    border: 0px;
+    background-color: #fff;
+}

@@ -74,7 +74,7 @@ class SettingsController extends Controller {
     function getSettings($isAdminForm = false, $defaultLang = null) {
         $data = $this->getFiles($isAdminForm, $defaultLang);
         $data['cookieData'] = $this->config->getCookieData($isAdminForm);
-        $data['textData'] = $this->config->getDisclaimerType();
+        $data['textData'] = $this->config->getDisclaimerType(true);
         return $data;
     }
 
@@ -141,7 +141,7 @@ class SettingsController extends Controller {
         $disclaimerLayout = $this->config->getDisclaimerLayout();
         if ($disclaimerLayout !== '') {
             $data = $this->getFiles();
-            $data['textData'] = $this->config->getDisclaimerType();
+            $data['textData'] = $this->config->getDisclaimerType(true);
         }
         $data['layout'] = $disclaimerLayout; 
         return $data;

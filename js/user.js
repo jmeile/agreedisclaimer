@@ -54,7 +54,9 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
                     obj.showTxt = settings['txtFileData']['value'];
                     obj.showPdf = settings['pdfFileData']['value'];
                     obj.disclaimerTitle = t(obj.appName,
-                        settings['textData']['name']);
+                        settings['textData'][1]['name']);
+                    obj.disclaimerMenu = t(obj.appName,
+                        settings['textData'][1]['menu']);
 
                     if (obj.showTxt) {
                         if (settings['txtFileData']['error'] === '') {
@@ -164,7 +166,8 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
                 this.appName + '-' + this.disclaimerLayout);
 
             var disclaimerLink = $('<a />');
-            disclaimerLink.text(this.disclaimerTitle);
+            disclaimerLink.text(this.disclaimerMenu);
+            disclaimerLink.attr('title', this.disclaimerTitle);
             menuEntry.append(disclaimerLink);
 
             //Quick hack to be able to access the 'this' object properties
@@ -178,6 +181,7 @@ var AgreeDisclaimer = AgreeDisclaimer || {};
                 });
                 if (this.showPdf) {
                     pdfLink = $('<a />');
+                    pdfLink.attr('title', this.disclaimerTitle);
                 }
             } else {
                 pdfLink = disclaimerLink;

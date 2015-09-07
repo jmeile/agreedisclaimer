@@ -42,9 +42,6 @@ class Config {
     /** @var ILogger    Logger service */
     private $logger;
 
-    /** @var array    Disclaimer types */
-    private $disclaimerTypes;
-
     /**
      * Creates a Config object an registers the admin page for the app
      *
@@ -79,23 +76,6 @@ class Config {
         $container->registerParameter('phpDateFormat', 'm/d/Y');
         $container->registerParameter('datepickerDateFormat', 'mm/dd/yy');
         $container->registerParameter('phpTimeFormat', 'H:i');
-
-        //Please note that the disclaimer types must always have the
-        //placeholders: %s1 and %s2, this will be replaced afterwards by an html
-        //anchor tag '<a>' if the txtFile property is enabled. You may add your
-        //own here, but remember to translate them in the l10n files
-        $this->disclaimerTypes = [];
-        $this->disclaimerTypes['liability']['name'] = 'Disclaimer of liability';
-        $this->disclaimerTypes['liability']['text'] = 'I have read and ' .
-            'understood the %s1disclaimer of liability%s2';
-
-        $this->disclaimerTypes['legal']['name'] = 'Legal disclaimer';
-        $this->disclaimerTypes['legal']['text'] = 'I have read and ' .
-            'understood the %s1legal disclaimer%s2';
-
-        $this->disclaimerTypes['gtc']['name'] = 'General Terms and conditions';
-        $this->disclaimerTypes['gtc']['text'] = 'I accept ' .
-            'the %s1general terms and conditions%s2';
 
         $this->disclaimerLayouts = [
             ''          => 'None',
@@ -542,32 +522,110 @@ class Config {
     /**
      * Gets the disclaimer texts
      *
-     * @return array    The disclaimer texts as an array of the form
-     *                  ['<disclaimerType>' => [
-     *                          'name' => '<disclaimerName>',
-     *                          'text' => '<disclaimerText>'
-     *                      ],...
+     * @param bool @asString    Whether or not to get the disclaimer as a string
+     *      or as JSON data
+     *
+     * @return string   The disclaimer texts as a JSON string of the form
+     *                  [ {
+     *                      "name":        "<disclaimerName>",
+     *                      "text":        "<disclaimerText>",
+     *                      "menu":        "<disclaimerMenuEntry>",
+     *                      "allowDelete": <boolean>,
+     *                    }, ...
      *                  ]
+     *                  allowDelete is optional. When not present, then 'true'
+     *                  will be assumed. Please also note that the values of
+     *                  "name", "text", and "menu" should be inserted as strings
+     *                  in the l10n files
      */
-    public function getDisclaimerTypes() {
-        return $this->disclaimerTypes;
+    public function getDisclaimerTypes($asString = false) {
+        $disclaimerTypesStr = $this->getProp('disclaimerTypes', '');
+        if ($disclaimerTypesStr === '') {
+            //This means either that the user is upgrading from an older version
+            //or this is the first time that the app is being setup
+
+            //Please note that the disclaimer types must always have the
+            //placeholders: @s1 and @s2, this will be replaced afterwards by an
+            //html anchor tag '<a>' if the txtFile property is enabled.
+            $defaultDisclaimers = [
+                [
+                    'name'        => 'Disclaimer of liability',
+                    'text'        => 'I have read and understood the ' .
+                                     '@s1disclaimer of liability@s2',
+                    'menu'        => 'Disclaimer of liability',
+                    'allowDelete' => false
+                ],
+                [
+                    'name'        => 'Legal disclaimer',
+                    'text'        => 'I have read and understood the @s1legal' .
+                                     ' disclaimer@s2',
+                    'menu'        => 'Legal disclaimer',
+                    'allowDelete' => false
+                ],
+                [
+                    'name'        => 'General Terms and conditions',
+                    'text'        => 'I accept the @s1general terms and ' .
+                                     'conditions@s2',
+                    'menu'        => 'GTC',
+                    'allowDelete' => false
+                ],
+            ];
+            $disclaimerTypes = $defaultDisclaimers;
+            $disclaimerTypesStr = json_encode($disclaimerTypes);
+            $this->setProp('disclaimerTypes', $disclaimerTypesStr);
+            if ($asString) {
+                $disclaimerTypes = $disclaimerTypesStr;
+            }
+        } else {
+            $disclaimerTypes = $disclaimerTypesStr;
+            if (!$asString) {
+                $disclaimerTypes = json_decode($disclaimerTypesStr, true);
+            }
+        }
+        return $disclaimerTypes;
     }
 
     /**
-     * Gets the choosen disclaimer text 
+     * Gets the choosen disclaimer text
      *
-     * @return array   The choosen disclaimer text as an array of the form
-     *                 ['value' => '<disclaimerType>',
-     *                  'name'  => '<disclaimerName>',
-     *                  'text'  => '<disclaimerText>'
+     * @param bool $getFullRecord   Gets the full disclaimer record with
+     *                 following information:
+     *                 [<disclamerIndex>, {
+     *                   "name":        "<disclaimerName>",
+     *                   "text":        "<disclaimerText>",
+     *                   "menu":        "<disclaimerMenuEntry>",
+     *                   "allowDelete": <boolean>,
+     *                  }
      *                 ]
+     *
+     * @return misc Either an array (See $getFullRecord parameter) or the index
+     *              of the current disclaimer type
      */
-    public function getDisclaimerType() {
-        $data = [];
-        $data['value'] = $this->getProp('disclaimerType', 'liability');
-        $data['name'] = $this->disclaimerTypes[$data['value']]['name'];
-        $data['text'] = $this->disclaimerTypes[$data['value']]['text'];
-        return $data;
+    public function getDisclaimerType($getFullRecord = false) {
+        $disclaimerType = $this->getProp('disclaimerType', '0');
+
+        //Fix it: This code assures that the app keeps working when upgrading
+        //from an old install, where the disclaimer type was stored as a string.
+        //In the newer version it is an integer index. This should be removed in
+        //future versions
+        $disclaimerIndexes = [
+            'liability' => '0',
+            'legal'     => '1',
+            'gtc'       => '2',
+        ];
+        if (isset($disclaimerIndexes[$disclaimerType])) {
+            //This means that it is an old install, so, it will be converted to
+            //a int key
+            $disclaimerType = $disclaimerIndexes[$disclaimerType];
+            $this->setProp('disclaimerType', $disclaimerType);
+        }
+        $disclaimerType = intval($disclaimerType);
+
+        if (!$getFullRecord)
+            return $disclaimerType;
+
+        $disclaimerTypes = $this->getDisclaimerTypes();
+        return [$disclaimerType, $disclaimerTypes[$disclaimerType]];
     }
 
     /**
