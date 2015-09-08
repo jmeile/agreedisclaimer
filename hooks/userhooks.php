@@ -61,7 +61,8 @@ class UserHooks {
             $appName = $app->getAppName(); 
             $config = $app->getConfig();
 
-            $isDav = $this->request->getScriptName() === '/remote.php';
+            $isDav = strpos($this->request->getScriptName(),
+                '/remote.php') !== false;
             $disclaimerChecked = isset($_POST[$appName. 'Checkbox']);
 
             if (
