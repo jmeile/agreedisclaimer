@@ -1,3 +1,12 @@
+#AgreeDisclaimer (1.0.2) - 08.09.2015
+* The issue:
+  - dav sync error
+    https://github.com/jmeile/agreedisclaimer/issues/7
+
+    was only partially solved on branch: 0.1.1. It worked for VirtualHost where
+    there was not "/owncloud" as the part of the domain. Now, this fix is also
+    working for those cases.
+
 #AgreeDisclaimer (1.0.1) - 07.09.2015
 ##CHANGES
 * Implemented enhacement request:
