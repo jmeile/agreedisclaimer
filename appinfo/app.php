@@ -13,8 +13,8 @@ namespace OCA\AgreeDisclaimer\AppInfo;
 /**
  * Creates the application and renders the login template for the anonymous user
  */
-
 $app = new Application();
+$app->setUserHeader();
 $app->registerAll();
 
 $templateResponse = $app->getDisclaimerForm();

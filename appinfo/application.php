@@ -221,4 +221,18 @@ class Application extends App {
     public function getUtils() {
         return $this->utils;
     }
+
+    /**
+     * Sets the X-OCUser, which contains the current logged user.
+     * This is needed to log the UID of the current user in the apache log.
+     */
+    public function setUserHeader() {
+        $container = $this->getContainer();
+        $session = $container->query('OCP\IUserSession');
+        $headerValue = '-';
+        if ($session->isLoggedIn()) {
+            $headerValue = $session->getUser()->getUID();
+        }
+        header('X-OCUser: ' . $headerValue);
+    }
 }

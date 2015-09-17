@@ -1,3 +1,14 @@
+#AgreeDisclaimer (1.0.3) - 17.09.2015
+* Added a new method to the Application class: setUserHeader. It sets an http
+  header called 'X-OCUser', which contains the current logged user. This is very
+  useful if you want to see the logins of the users in the apache logs. In order
+  to use it, you need first to define a custom log in apache that catches the
+  header:
+  LogFormat "%h - %{X-OCUser}o %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" ownCloud
+
+  In your VirtualHost use it as follows:
+  CustomLog ${APACHE_LOG_DIR}/owncloud_access.log owncloud
+
 #AgreeDisclaimer (1.0.2) - 08.09.2015
 * The issue:
   - dav sync error
