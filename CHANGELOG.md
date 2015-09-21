@@ -1,3 +1,12 @@
+#AgreeDisclaimer (1.0.4) - 21.09.2015 
+* Fixed css issue #16:
+  Search box will be displaced down when using a non-admin user
+  https://github.com/jmeile/agreedisclaimer/issues/16
+
+  This turned to be rights problem over the router: getDisclaimerLayout, it was
+  only accessible by admin users because no permissions were set. This was fixed
+  by adding: "@NoAdminRequired"
+
 #AgreeDisclaimer (1.0.3) - 17.09.2015
 * Added a new method to the Application class: setUserHeader. It sets an http
   header called 'X-OCUser', which contains the current logged user. This is very

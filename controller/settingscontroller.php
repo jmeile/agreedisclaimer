@@ -123,6 +123,7 @@ class SettingsController extends Controller {
     }
 
     /**
+     * @NoAdminRequired
      * Gets the disclaimer layout and the file information
      *
      * @return array   Array with the file information for the txt and pdf
