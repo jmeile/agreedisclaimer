@@ -61,6 +61,13 @@ class Application extends App {
         $this->utils = New Utils($this, $this->l10n);
     }
 
+    private function setLanguage($language)
+    {
+        $container = $this->getContainer();
+        $server = $container->getServer();
+        $this->l10n = $server->getL10N($this->appName, $language);
+    }
+
     /**
      * Registers all services
      */
@@ -172,7 +179,9 @@ class Application extends App {
                     //the ownCloud library doesn't have any other way
                     if (\OC_L10N::languageExists($this->appName, $langCode)) {
                         $userLang = $langCode;
-                        \OC_L10N::forceLanguage($userLang);
+                        //\OC_L10N::forceLanguage($userLang);
+                        //$this->setLanguage($userLang);
+                        //$l = new OC_L10N('test', $lang);
                         break;
                     }
                 }
