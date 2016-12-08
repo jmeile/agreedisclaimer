@@ -1,7 +1,7 @@
 Bitte beachten Sie, dass dieser Dienst keine Backup-Lösung ist. Diese
 Applikation dient dazu, Dateien zwischen zwei oder mehreren Benutzern
 auszutauschen. Wir übernehmen keine Haftung für den Datenverlust. Der Benutzer
-selbst für die Datensicherung verantwortlich.<br/><br/>
+ist selbst für die Datensicherung verantwortlich.<br/><br/>
 
 Die Anwendung darf nur für den Austausch legaler Daten verwendet werden. Der
 Anwender ist verantwortlich für jeglichen Verstoss gegen gültige
